@@ -1,0 +1,319 @@
+body {
+    background: #F6EEEB;
+    font-size: 13px;
+    line-height: 1.6em;
+    color:#5F4A4A;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.02em;
+    margin:0;
+    padding:0;
+}
+::selection {
+    background-color: #EAD7D0;
+}
+
+h1 {
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 50px;
+  letter-spacing: -0.01em;
+  color: #2A2929;
+  margin: 0;
+}
+
+h2 {
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: #5F4A4A;
+  margin: 1em 0 0 0;
+}
+
+h3 {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 21px;
+  letter-spacing: 0.02em;
+  color: #2A2929;
+  margin:16px 4px 8px 0;
+}
+p {
+  margin:0;
+}
+
+.top-bar {
+  background-color: #16161d;
+  width:100%;
+  margin: 0;
+  padding: 20vh 0 20vh 0;
+}
+
+.container--title {
+  max-width: 760px;
+  width:100%;
+  padding: 80px 160px 80px 160px;
+  margin: auto;
+  color: #EAD6D0;
+  text-transform: uppercase;
+}
+.container--content {
+  max-width: 760px;
+  padding: 40px 160px 80px 160px;
+  margin: auto;
+}
+
+.title {
+  color: #EAD6D0;
+  font-size: 72px;
+  line-height: 73px;
+  letter-spacing: 0.01em;
+  font-family: 'DM Sans', sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-align: right;
+  margin:0;
+}
+.subtitle {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 36px;
+  line-height: 38px;
+  text-align: right;
+  letter-spacing: 0.02em;
+  color: #EAD6D0;
+  margin:6px 0 0 0;
+}
+.title-pic {
+  width: 18em;
+  height: 18em;
+  background-image: url('../assets/mitch-barwick-designer-duotone 1.png');
+  background-size: cover;
+  border-radius: 9em;
+  float: left;
+  position: relative;
+  top: -6em;
+  margin-bottom: -6em;
+}
+
+.skills {
+  list-style: none;
+  font-weight: 500;
+  font-size: 0.78em;
+  line-height: 0.78em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #F6EEEB;
+  display: inline-block;
+  text-indent: 0;
+  padding:0;
+  margin: 0.5em 0 0.5em 0;
+}
+.skills--token {
+  padding: 0.5em 0.5em 0.4em 0.5em;
+  background-color: #9E6161;
+  border-radius: 0.46em;
+  float: left;
+  margin-right: 0.24em;
+}
+
+.recognition--token {
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #EAD6D0;
+  background: #9E6161;
+  border-radius: 6px;
+  padding: 6px 6px 5px;
+  border-radius: 6px;
+  margin:16px 4px 0 0;
+}
+
+.hero {
+  width: 100vw;
+  height: 98vh;
+  background-color:#05040c;
+}
+.hero__container {
+  width: 80vw;
+  color: #ffffff;
+  font-size: 6vh;
+  line-height: calc(1em * 1.68);
+  padding: 0 10vw;
+  text-align: center;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.hero__container>strong {
+  color: #f8bc4a;
+  font-weight: normal;
+}
+.bgdg--container {
+    display: flex;
+    justify-content: center;
+    margin: 2.68rem 0 2rem 0;
+}
+.be-good {
+    flex-grow: 6;
+    text-align: right;
+    padding-right: 0.5rem;
+}
+.do-good {
+    flex-grow: 6;
+    padding-left: 0.5rem;
+}
+q {
+    font-family: quasimoda, san-serif;
+    font-size: 1.6rem;
+    line-height: 2.5rem;
+    padding-left: 1.6rem;
+    display: block;
+    border-left: solid 2px #f8bc4a;
+    text-align: left;
+}
+
+.quote--author {
+    width: 100%;
+    text-align: right;
+    display: block;
+    font-style: italic;
+}
+u {
+    text-decoration-color: #f8bc4a;
+}
+i {
+    color: #25404b;
+}
+a {
+    color: #27313b;
+}
+a:hover {
+    background-color: #EAD7D0;
+}
+a:visited {
+    color:#0f1022;
+}
+strong {
+    color: #25404b;
+}
+hr {
+    border-top: 1px solid;
+    color: #f8feff;
+    margin: 2rem auto 2rem auto;
+}
+.paragraph__long-story {
+    width: 100%;
+    margin-bottom:1em;
+}
+.container {
+    width: 48em;
+    margin: auto;
+}
+
+.socials__list {
+    padding-left: 0;
+}
+.socials__list li {
+    list-style: none;
+}
+.socials__list li i {
+    color: #9E6161;
+    margin-right: 0.25em;
+}
+.socials__list li a {
+    text-decoration-color: #9E6161;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 21px;
+    letter-spacing: 0.02em;
+}
+
+
+
+
+@media only screen and (max-width: 1024px) {
+    .top-bar {
+            height:92em;
+            padding: 0;
+    }
+    .container--title {
+            padding: 4em;
+    }
+    .title {
+      transform: rotate(-90deg);
+      font-size: 144px;
+      line-height: 146px;
+      position: relative;
+      width: 800px;
+      left: 0.4em;
+      top: 260px;
+    }
+    .subtitle {
+      transform: rotate(-90deg);
+      font-size: 72px;
+      line-height: 76px;
+      position: relative;
+      width: 800px;
+      left: 4.6em;
+    }
+    .title-pic {
+      width: 29.3em;
+      height: 28em;
+      border-radius: 9em;
+      float: left;
+      position: relative;
+      top: 24em;
+    }
+
+    .container--content {
+      padding: 90px 20px 80px 20px;
+    }
+
+    h2 {
+      font-size: 48px;
+      line-height: 64px;
+      letter-spacing: 0.04em;
+    }
+
+    h3 {
+      font-size: 30px;
+      line-height: 40px;
+      letter-spacing: 0.04em;
+    }
+    p {
+      line-height: 4em;
+    }
+
+    .skills {
+      font-size: 2em;
+      line-height: 1.56em;
+      letter-spacing: 0.04em;
+      margin: 1em 0 1em 0;
+    }
+    .skills--token {
+      padding: 0.4em 1em 0.3em 1em;
+      border-radius: 0.92em;
+      margin: 0 0.48em 0.48em 0;
+    }
+
+    .recognition--token {
+      font-size: 0.7em;
+      line-height: 0.8em;
+      background: #9E6161;
+      border-radius: 0.92em;
+      padding: 0.4em 1em 0.3em 1em;
+  }
+  .socials__list li i {
+      color: #9E6161;
+      display: inline;
+      padding-right: 0.6em;
+  }
+}
