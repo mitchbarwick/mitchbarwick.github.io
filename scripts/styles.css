@@ -249,7 +249,7 @@ hr {
     }
     .title {
       transform: rotate(-90deg);
-      font-size: 144px;
+      font-size: 144px !important;
       line-height: 146px;
       position: relative;
       width: 800px;
