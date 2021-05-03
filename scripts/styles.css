@@ -240,6 +240,9 @@ hr {
 
 
 @media only screen and (max-width: 1024px) {
+  body {
+    font-size: 26px;
+  }
     .top-bar {
             height:92em;
             padding: 0;
