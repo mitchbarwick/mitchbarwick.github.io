@@ -240,9 +240,7 @@ hr {
 
 
 @media only screen and (max-width: 1024px) {
-  body {
-    font-size: 26px;
-  }
+
     .top-bar {
             height:92em;
             padding: 0;
@@ -292,6 +290,7 @@ hr {
       letter-spacing: 0.04em;
     }
     p {
+      font-size: 26px;
       line-height: 4em;
     }
 
