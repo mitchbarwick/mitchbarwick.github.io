@@ -1,0 +1,27 @@
+body {
+  font-size: 16pt;
+  background-color: #16161d;
+  color: #efefef;
+  font-family: 'DM Sans', sans-serif;
+}
+
+h1 {
+  font-size: 72pt;
+  background: -webkit-linear-gradient(#00A3FF, #00F0FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 16pt;
+}
+
+.strike {
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 0, 0, 0.8);
+}
+
+.container {
+  height: 60vh;
+  width:55vw;
+  text-align: center;
+  padding: 40vh 20vw 0 20vw;
+  margin:auto;
+}
