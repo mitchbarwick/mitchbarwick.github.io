@@ -114,20 +114,26 @@ $$('.art').forEach(svg => {
 
 /* ---------- hero avatar ---------- */
 const avatar = $('#avatar'), avVideo = $('#avatarVideo');
-// soft dream-portal edge: the morphing outline is painted blurred into a small canvas and used as the video's alpha mask
-const PM = 160, pc = document.createElement('canvas'); pc.width = pc.height = PM;
+// soft dream-portal edge: the morphing outline is painted blurred onto a canvas, then the video is composited into it (source-in).
+// Drawing the mask and video in one canvas keeps every frame atomic, so the edge never flickers.
+const pc = document.createElement('canvas'); pc.className = 'portal'; pc.setAttribute('aria-hidden', 'true');
+avVideo.after(pc);
 const pctx = pc.getContext('2d');
-let portalFrame = 0;
 function drawPortal(d) {
-  const S = PM * 2, size = cloud.portalSize, blur = cloud.portalBlur * PM;
-  pctx.clearRect(0, 0, PM, PM);
+  const W = Math.round(avatar.offsetWidth * Math.min(devicePixelRatio || 1, 2));
+  if (!W || !avVideo.videoWidth) return;
+  if (pc.width !== W) pc.width = pc.height = W;
+  const S = W * 2, size = cloud.portalSize;
+  pctx.globalCompositeOperation = 'source-over';
+  pctx.clearRect(0, 0, W, W);
   pctx.save();
-  pctx.shadowColor = '#000'; pctx.shadowBlur = blur; pctx.shadowOffsetX = S;
-  pctx.translate(-S + PM / 2, PM / 2); pctx.scale(PM * size, PM * size); pctx.translate(-.5, -.5);
+  pctx.shadowColor = '#000'; pctx.shadowBlur = cloud.portalBlur * W; pctx.shadowOffsetX = S;
+  pctx.translate(-S + W / 2, W / 2); pctx.scale(W * size, W * size); pctx.translate(-.5, -.5);
   pctx.fill(new Path2D(d));
   pctx.restore();
-  const url = `url(${pc.toDataURL()})`;
-  avVideo.style.webkitMaskImage = avVideo.style.maskImage = url;
+  pctx.globalCompositeOperation = 'source-in';
+  const vw = avVideo.videoWidth, vh = avVideo.videoHeight, k = Math.max(W / vw, W / vh);   // object-fit: cover
+  pctx.drawImage(avVideo, (W - vw * k) / 2, (W - vh * k) / 2, vw * k, vh * k);
 }
 const av = { h: harmonics(7), rh: [harmonics(21), harmonics(33), harmonics(45)], x: 0, y: 0, tx: 0, ty: 0, hover: 0 };
 function updateAvatar(t) {
@@ -142,7 +148,7 @@ function updateAvatar(t) {
   const px = (ptr.x - r.left) / r.width, py = (ptr.y - r.top) / r.height;
   avatar.style.transform = `translate(${av.x}px,${av.y - scrollY * .08}px) rotate(${av.x * .03}deg)`;
   const d = outline({ n: 2.15, amp: .05 + av.hover * .014, t: t * (.9 + av.hover * .1), h: av.h, N: 30, fit: 1, hover: av.hover * .4, px, py });
-  if ((portalFrame++ & 1) === 0) drawPortal(d);
+  drawPortal(d);
 }
 
 /* ---------- hero name: variable-font letters ---------- */
