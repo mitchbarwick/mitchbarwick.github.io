@@ -152,16 +152,6 @@ function updateName(t) {
   });
 }
 
-/* ---------- marquee ---------- */
-const track = $('#marquee .track');
-let mx = 0;
-function updateMarquee(dt) {
-  const w = track.children[0].getBoundingClientRect().width || 1;
-  mx -= (40 + scrollVel * 1.4) * dt;
-  mx = ((mx % w) + w) % w - w;       // wrap
-  track.style.transform = `translateX(${mx.toFixed(1)}px)`;
-}
-
 /* ---------- magnetic elements ---------- */
 $$('[data-magnet]').forEach(el => {
   if (!finePointer) return;
@@ -328,7 +318,6 @@ function frame(now) {
   }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
-  updateMarquee(frozen ? 0 : dt);
   if (!frozen || !frame.once) { frame.once = true; }
   requestAnimationFrame(frame);
 }
