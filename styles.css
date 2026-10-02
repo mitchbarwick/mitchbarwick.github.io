@@ -89,10 +89,10 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 /* 50/50 role split */
 .split{--a:0;max-width:46ch}
 .split-bar{display:flex;height:clamp(44px,5vw,56px);border-radius:999px;overflow:hidden;position:relative;border:1px solid var(--ink)}
-.seg{display:flex;align-items:center;padding:0 1.2em;white-space:nowrap;overflow:hidden;
+.seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 1.2em;white-space:nowrap;overflow:hidden;
   width:0;transition:width 1.8s var(--ease) calc(var(--d,0s) + .3s)}
-.seg-a{background:var(--ink);color:var(--bg);justify-content:flex-start}
-.seg-b{background:rgba(248,246,240,.55);justify-content:flex-end;position:relative}
+.seg-a{left:0;background:var(--ink);color:var(--bg);justify-content:flex-start}
+.seg-b{right:0;background:rgba(248,246,240,.55);justify-content:flex-end}
 .split.in .seg{width:50%}
 .split.in.live .seg-a{animation:balA 9s ease-in-out infinite}
 .split.in.live .seg-b{animation:balB 9s ease-in-out infinite}
