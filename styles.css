@@ -193,32 +193,31 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 .layer .pitch strong{font-weight:600}
 .layer .pitch em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1;background:linear-gradient(transparent 62%,rgba(38,38,38,.14) 0)}
 
-/* precise product above a sea of AI slop */
-.slop{position:relative;max-width:900px;margin:clamp(48px,7vw,96px) auto clamp(24px,4vw,48px);aspect-ratio:800/460}
-.slop svg{display:block;width:100%;height:100%;overflow:visible}
-.slop .surface{fill:none;stroke:var(--ink);stroke-width:1;opacity:.22;vector-effect:non-scaling-stroke}
-.slop .s{fill:var(--ink);opacity:0;transition:opacity 1.2s ease calc(var(--i) * 9ms + .5s)}
-.slop.in .s{opacity:var(--o);animation:bob var(--t) ease-in-out var(--dl) infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(var(--y))}}
-.slop .diamond{fill:var(--ink)}
-.slop .ring{fill:none;stroke:var(--bg);stroke-width:1.2;opacity:.8}
-.slop .core{fill:var(--bg)}
-.slop .prod{opacity:0;transform:translateY(-40px);transition:opacity 1s ease 1.2s,transform 1.6s var(--ease) 1.2s}
-.slop.in .prod{opacity:1;transform:none;animation:hover 6s ease-in-out 3s infinite}
-@keyframes hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.slop .beam{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:140;stroke-dashoffset:140;vector-effect:non-scaling-stroke;transition:stroke-dashoffset 1.2s var(--ease) 2.2s}
-.slop.in .beam{stroke-dashoffset:0}
-.slop .target{opacity:0;transition:opacity .6s ease 3.2s}
-.slop.in .target{opacity:1}
-.slop .dot{fill:var(--ink)}
-.slop .ripple{fill:none;stroke:var(--ink);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
-.slop.in .ripple{animation:ripple 3s ease-out 3.4s infinite}
-.slop.in .r2{animation-delay:4.4s}
-@keyframes ripple{0%{transform:scale(.8);opacity:.7}100%{transform:scale(4.5);opacity:0}}
-.slop .lab{position:absolute;color:var(--ink-2);white-space:nowrap;text-shadow:0 0 6px var(--bg),0 0 6px var(--bg),0 0 10px var(--bg);opacity:0;transition:opacity 1s ease 3s}
-.slop.in .lab{opacity:1}
-.lab-prod{left:62%;top:27%}
-.lab-target{left:55%;top:73%}
-.lab-sea{left:0;bottom:-9%}
-@media (max-width:560px){.slop .lab{font-size:.6rem}.lab-prod{left:60%}.slop .lab-target{left:55%;white-space:normal;width:40%;line-height:1.35}}
-@media (prefers-reduced-motion:reduce){.slop *{animation:none!important}}
+/* three layers: problem -> approach -> solution */
+.flow{position:relative;max-width:900px;margin:clamp(48px,7vw,96px) auto clamp(24px,4vw,48px);aspect-ratio:800/480}
+.flow svg{display:block;width:100%;height:100%;overflow:visible}
+.flow .plane{opacity:0;transform:translateY(-24px);transition:opacity 1s ease,transform 1.4s var(--ease)}
+.flow.in .plane{opacity:1;transform:none}
+.flow.in .p1{transition-delay:.3s}.flow.in .p2{transition-delay:.9s}.flow.in .p3{transition-delay:1.5s}
+.flow .face{stroke:var(--ink);stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.flow .p1 .face{fill:rgba(248,246,240,.25);stroke-width:1;stroke-dasharray:2 6;stroke-linecap:round;opacity:.8}
+.flow .p2 .face{fill:rgba(248,246,240,.5);stroke-width:1;opacity:.75}
+.flow .p3 .face{fill:rgba(38,38,38,.14);stroke-width:1.6;opacity:1}
+.flow .product{fill:var(--ink);stroke:var(--ink);stroke-width:10;stroke-linejoin:round;opacity:0;transition:opacity 1.2s ease 2.2s}
+.flow.in .product{opacity:1;animation:solid 5s ease-in-out 4s infinite}
+@keyframes solid{0%,100%{stroke-width:10}50%{stroke-width:14}}
+.flow .core{fill:var(--bg);opacity:0;transition:opacity 1s ease 3s}
+.flow.in .core{opacity:1}
+.flow .pdot{fill:none;stroke:var(--ink);stroke-width:1;opacity:.55}
+.flow .pdot.hot{fill:var(--ink);opacity:.9}
+.flow .node{fill:var(--bg);stroke:var(--ink);stroke-width:1}
+.flow .edge{stroke:var(--ink);stroke-width:1;opacity:.28;vector-effect:non-scaling-stroke}
+.flow .fp{fill:none;stroke:var(--ink);stroke-width:1;opacity:0;vector-effect:non-scaling-stroke;transition:opacity 1.5s ease 2.4s}
+.flow.in .fp{opacity:.1}
+.flow .ptc{fill:var(--ink)}
+.flow .lab{position:absolute;left:0;width:26%;color:var(--ink-2);line-height:1.35;opacity:0;transition:opacity 1s ease}
+.flow .lab b{display:block;color:var(--ink);font-weight:500}
+.flow.in .lab{opacity:1}
+.flow.in .lab1{transition-delay:.8s}.flow.in .lab2{transition-delay:1.4s}.flow.in .lab3{transition-delay:2s}
+.lab1{top:3%}.lab2{top:34%}.lab3{top:65%}
+@media (max-width:560px){.flow .lab{font-size:.58rem;width:24%}.flow .lab3{top:57%}}

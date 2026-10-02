@@ -83,25 +83,17 @@
         <p>Building the thing itself. Prototypes, agents and production interfaces, made alongside engineers, analysts and, increasingly, AI as a pair.</p>
       </article>
     </div>
-    <figure class="slop rv" id="slop" aria-label="Diagram: a single precise product aimed at one high-value problem, standing above a sea of generic AI-built products">
-      <svg viewBox="0 0 800 460" aria-hidden="true">
-        <path class="surface" d="M0 262 Q 100 250 200 262 T 400 262 T 600 262 T 800 262"/>
-        <g id="slopSea"></g>
-        <line class="beam" x1="400" y1="208" x2="400" y2="342"/>
-        <g class="target">
-          <circle class="ripple r1" cx="400" cy="350" r="9"/>
-          <circle class="ripple r2" cx="400" cy="350" r="9"/>
-          <circle class="dot" cx="400" cy="350" r="6"/>
-        </g>
-        <g class="prod">
-          <path class="diamond" d="M400 92 L458 150 L400 208 L342 150 Z"/>
-          <circle class="ring" cx="400" cy="150" r="22"/>
-          <circle class="core" cx="400" cy="150" r="6"/>
-        </g>
+    <figure class="flow rv" id="flow" aria-label="Diagram: three layers. What problem to solve flows through how to solve it, and arrives as a precise, high value solution, which is the most solid layer.">
+      <svg viewBox="0 0 800 480" aria-hidden="true">
+        <g class="plane p3"><path class="face" d="M100 390 L400 328 L700 390 L400 452 Z"/><path class="product" d="M400 356 L452 390 L400 424 L348 390 Z"/><circle class="core" cx="400" cy="390" r="7"/></g>
+        <g class="plane p2"><path class="face" d="M100 250 L400 188 L700 250 L400 312 Z"/><g id="flowNodes"></g></g>
+        <g class="plane p1"><path class="face" d="M100 110 L400 48 L700 110 L400 172 Z"/><g id="flowDots"></g></g>
+        <g id="flowPaths"></g>
+        <g id="flowParticles"></g>
       </svg>
-      <span class="lab lab-prod mono">A precise product</span>
-      <span class="lab lab-target mono">Aimed at one high-value problem</span>
-      <span class="lab lab-sea mono">The sea of AI slop</span>
+      <span class="lab lab1 mono"><b>01</b> What problem to solve</span>
+      <span class="lab lab2 mono"><b>02</b> How to solve it</span>
+      <span class="lab lab3 mono"><b>03</b> Precise, high value solution</span>
     </figure>
 
   </section>

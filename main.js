@@ -152,25 +152,47 @@ function updateName(t) {
   });
 }
 
-/* ---------- sea of AI slop ---------- */
-(() => {
-  const sea = $('#slopSea'); if (!sea) return;
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const rows = 7, perRow = 22;
-  let n = 0;
-  for (let r = 0; r < rows; r++) {
-    for (let k = 0; k < perRow; k++) {
-      const w = 16 + rnd() * 20, h = w * (.7 + rnd() * .5);
-      const x = (k + rnd() * .8) * (800 / perRow) + (r % 2) * 18 - 10, y = 282 + r * 24 + rnd() * 10;
-      if (Math.hypot(x + w / 2 - 400, y + h / 2 - 350) < 34) continue;   // keep clear around the target
-      const el = document.createElementNS(NS, 'rect');
-      el.setAttribute('class', 's'); el.setAttribute('x', x.toFixed(1)); el.setAttribute('y', y.toFixed(1));
-      el.setAttribute('width', w.toFixed(1)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('rx', (2 + rnd() * 6).toFixed(1));
-      el.style.cssText = `--i:${n++};--o:${(.08 + rnd() * .16 + r * .012).toFixed(2)};--t:${(4 + rnd() * 4).toFixed(1)}s;--dl:${(-rnd() * 6).toFixed(1)}s;--y:${(rnd() < .5 ? -1 : 1) * (3 + rnd() * 4)}px`;
-      sea.appendChild(el);
-    }
+/* ---------- problem -> approach -> solution flow ---------- */
+const flowUpdate = (() => {
+  const el = $('#flow'); if (!el) return () => {};
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+  const inDiamond = yc => { let u, v; do { u = rnd() * 2 - 1; v = rnd() * 2 - 1; } while (Math.abs(u) + Math.abs(v) > .9); return [400 + u * 270, yc + v * 50]; };
+  // layer 1: scattered problems, one of them the high-value one
+  const dots = $('#flowDots'), starts = [];
+  for (let i = 0; i < 26; i++) {
+    const [x, y] = i === 0 ? [400, 110] : inDiamond(110);
+    mk('circle', { class: 'pdot' + (i === 0 ? ' hot' : ''), cx: x.toFixed(1), cy: y.toFixed(1), r: i === 0 ? 6 : (2 + rnd() * 3.5).toFixed(1) }, dots);
+    starts.push([x, y]);
   }
+  // layer 2: a small network of "how" nodes
+  const nodes = [[205, 250], [295, 230], [325, 272], [400, 250], [475, 228], [505, 272], [595, 250]];
+  const ng = $('#flowNodes');
+  [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4], [3, 5], [4, 6], [5, 6], [1, 2], [4, 5]].forEach(([a, b]) => mk('line', { class: 'edge', x1: nodes[a][0], y1: nodes[a][1], x2: nodes[b][0], y2: nodes[b][1] }, ng));
+  nodes.forEach(([x, y]) => mk('circle', { class: 'node', cx: x, cy: y, r: 4 }, ng));
+  // flow paths: problem -> nearest node -> a tight point inside the solid product
+  const pg = $('#flowPaths'), pp = $('#flowParticles'), flows = [];
+  starts.forEach(([sx, sy]) => {
+    let n = nodes[0], bd = 1e9;
+    nodes.forEach(m => { const d = Math.abs(m[0] - sx) + rnd() * 120; if (d < bd) { bd = d; n = m; } });
+    const ex = 400 + (rnd() - .5) * 36, ey = 390 + (rnd() - .5) * 14;
+    const d = `M${sx.toFixed(1)} ${sy.toFixed(1)} C${sx.toFixed(1)} ${(sy + 60).toFixed(1)} ${n[0]} ${n[1] - 60} ${n[0]} ${n[1]} S${ex.toFixed(1)} ${(ey - 70).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+    const path = mk('path', { class: 'fp', d }, pg);
+    flows.push({ path, len: path.getTotalLength(), off: rnd(), sp: .05 + rnd() * .035, dot: mk('circle', { class: 'ptc', r: (1.6 + rnd() * 1.4).toFixed(1), opacity: 0 }, pp) });
+  });
+  return (t, on) => {
+    if (!on) return;
+    flows.forEach(f => {
+      const p = ((t * f.sp + f.off) % 1);
+      const e = p * p * (3 - 2 * p) * .5 + p * .5;
+      const pt = f.path.getPointAtLength(e * f.len);
+      f.dot.setAttribute('cx', pt.x.toFixed(1)); f.dot.setAttribute('cy', pt.y.toFixed(1));
+      f.dot.setAttribute('opacity', (Math.min(p / .12, (1 - p) / .1, 1) * (.35 + .65 * p)).toFixed(2));
+    });
+  };
 })();
+const flowEl = $('#flow'); let flowVis = false;
+if (flowEl) new IntersectionObserver(es => es.forEach(e => flowVis = e.isIntersecting)).observe(flowEl);
 
 /* ---------- magnetic elements ---------- */
 $$('[data-magnet]').forEach(el => {
@@ -338,6 +360,7 @@ function frame(now) {
   }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
+  if (flowVis && flowEl.classList.contains('in')) flowUpdate(frozen ? 0 : t, true);
   if (!frozen || !frame.once) { frame.once = true; }
   requestAnimationFrame(frame);
 }
