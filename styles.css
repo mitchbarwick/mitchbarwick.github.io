@@ -193,31 +193,18 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 .layer .pitch strong{font-weight:600}
 .layer .pitch em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1;background:linear-gradient(transparent 62%,rgba(38,38,38,.14) 0)}
 
-/* three layers: problem -> approach -> solution */
-.flow{position:relative;max-width:900px;margin:clamp(48px,7vw,96px) auto clamp(24px,4vw,48px);aspect-ratio:800/480}
-.flow svg{display:block;width:100%;height:100%;overflow:visible}
-.flow .plane{opacity:0;transform:translateY(-24px);transition:opacity 1s ease,transform 1.4s var(--ease)}
-.flow.in .plane{opacity:1;transform:none}
-.flow.in .p1{transition-delay:.3s}.flow.in .p2{transition-delay:.9s}.flow.in .p3{transition-delay:1.5s}
-.flow .face{stroke:var(--ink);stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.flow .p1 .face{fill:rgba(248,246,240,.25);stroke-width:1;stroke-dasharray:2 6;stroke-linecap:round;opacity:.8}
-.flow .p2 .face{fill:rgba(248,246,240,.5);stroke-width:1;opacity:.75}
-.flow .p3 .face{fill:rgba(38,38,38,.14);stroke-width:1.6;opacity:1}
-.flow .product{fill:var(--ink);stroke:var(--ink);stroke-width:10;stroke-linejoin:round;opacity:0;transition:opacity 1.2s ease 2.2s}
-.flow.in .product{opacity:1;animation:solid 5s ease-in-out 4s infinite}
-@keyframes solid{0%,100%{stroke-width:10}50%{stroke-width:14}}
-.flow .core{fill:var(--bg);opacity:0;transition:opacity 1s ease 3s}
-.flow.in .core{opacity:1}
-.flow .pdot{fill:none;stroke:var(--ink);stroke-width:1;opacity:.55}
-.flow .pdot.hot{fill:var(--ink);opacity:.9}
-.flow .node{fill:var(--bg);stroke:var(--ink);stroke-width:1}
-.flow .edge{stroke:var(--ink);stroke-width:1;opacity:.28;vector-effect:non-scaling-stroke}
-.flow .fp{fill:none;stroke:var(--ink);stroke-width:1;opacity:0;vector-effect:non-scaling-stroke;transition:opacity 1.5s ease 2.4s}
-.flow.in .fp{opacity:.1}
-.flow .ptc{fill:var(--ink)}
-.flow .lab{position:absolute;left:0;width:26%;color:var(--ink-2);line-height:1.35;opacity:0;transition:opacity 1s ease}
-.flow .lab b{display:block;color:var(--ink);font-weight:500}
-.flow.in .lab{opacity:1}
-.flow.in .lab1{transition-delay:.8s}.flow.in .lab2{transition-delay:1.4s}.flow.in .lab3{transition-delay:2s}
-.lab1{top:3%}.lab2{top:34%}.lab3{top:65%}
-@media (max-width:560px){.flow .lab{font-size:.58rem;width:24%}.flow .lab3{top:57%}}
+/* double diamond */
+.dd{position:relative;max-width:960px;margin:clamp(48px,7vw,96px) auto clamp(24px,4vw,48px);aspect-ratio:800/330}
+.dd svg{display:block;width:100%;height:100%;overflow:visible}
+.dd .outline{fill:none;stroke:var(--ink);stroke-width:.8;stroke-linejoin:round;opacity:.5}
+.dd .thread{fill:none;stroke:var(--ink);stroke-width:.8}
+.dd .pb{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.dd .id{fill:none;stroke:var(--ink);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.dd .pick{fill:var(--ink)}
+.dd .ripple{fill:none;stroke:var(--ink);stroke-width:1;vector-effect:non-scaling-stroke}
+.dd .pd{fill:var(--ink);stroke:var(--ink);stroke-width:10;stroke-linejoin:round}
+.dd .core{fill:var(--bg)}
+.dd .ph{position:absolute;bottom:0;transform:translateX(-50%);color:var(--ink-2);opacity:0;transition:opacity .8s ease,color .8s ease}
+.dd.in .ph{opacity:.35}
+.dd.in .ph.on{opacity:1;color:var(--ink)}
+@media (max-width:560px){.dd .ph{font-size:.55rem;letter-spacing:.02em}}

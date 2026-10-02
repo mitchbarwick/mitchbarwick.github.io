@@ -83,17 +83,20 @@
         <p>Building the thing itself. Prototypes, agents and production interfaces, made alongside engineers, analysts and, increasingly, AI as a pair.</p>
       </article>
     </div>
-    <figure class="flow rv" id="flow" aria-label="Diagram: three layers. What problem to solve flows through how to solve it, and arrives as a precise, high value solution, which is the most solid layer.">
-      <svg viewBox="0 0 800 480" aria-hidden="true">
-        <g class="plane p3"><path class="face" d="M100 390 L400 328 L700 390 L400 452 Z"/><path class="product" d="M400 356 L452 390 L400 424 L348 390 Z"/><circle class="core" cx="400" cy="390" r="7"/></g>
-        <g class="plane p2"><path class="face" d="M100 250 L400 188 L700 250 L400 312 Z"/><g id="flowNodes"></g></g>
-        <g class="plane p1"><path class="face" d="M100 110 L400 48 L700 110 L400 172 Z"/><g id="flowDots"></g></g>
-        <g id="flowPaths"></g>
-        <g id="flowParticles"></g>
+    <figure class="dd rv" id="dd" aria-label="Animated double diamond: exploring many problems, narrowing to the one most worth solving, exploring many possible solutions, then narrowing to the right fit.">
+      <svg viewBox="0 0 800 300" aria-hidden="true">
+        <path id="ddOutline" class="outline" d="M30 150 L215 40 L400 150 L585 40 L770 150 L585 260 L400 150 L215 260 Z"/>
+        <path id="ddThread" class="thread" opacity="0" d="M400 150 L668 150"/>
+        <g id="ddProblems"></g>
+        <g id="ddIdeas"></g>
+        <circle id="ddPick" class="pick" opacity="0" cx="400" cy="150" r="6"/>
+        <circle id="ddRipple" class="ripple" opacity="0" cx="400" cy="150" r="8"/>
+        <g id="ddProduct" class="product" opacity="0"><path class="pd" d="M700 122 L728 150 L700 178 L672 150 Z"/><circle class="core" cx="700" cy="150" r="6"/></g>
       </svg>
-      <span class="lab lab1 mono"><b>01</b> What problem to solve</span>
-      <span class="lab lab2 mono"><b>02</b> How to solve it</span>
-      <span class="lab lab3 mono"><b>03</b> Precise, high value solution</span>
+      <span class="ph mono" style="left:15.3%">Discover</span>
+      <span class="ph mono" style="left:38.4%">Define</span>
+      <span class="ph mono" style="left:61.5%">Develop</span>
+      <span class="ph mono" style="left:84.6%">Deliver</span>
     </figure>
 
   </section>

@@ -152,47 +152,93 @@ function updateName(t) {
   });
 }
 
-/* ---------- problem -> approach -> solution flow ---------- */
-const flowUpdate = (() => {
-  const el = $('#flow'); if (!el) return () => {};
-  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+/* ---------- double diamond: discover -> define -> develop -> deliver ---------- */
+const ddUpdate = (() => {
+  const el = $('#dd'); if (!el) return () => {};
+  let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
-  const inDiamond = yc => { let u, v; do { u = rnd() * 2 - 1; v = rnd() * 2 - 1; } while (Math.abs(u) + Math.abs(v) > .9); return [400 + u * 270, yc + v * 50]; };
-  // layer 1: scattered problems, one of them the high-value one
-  const dots = $('#flowDots'), starts = [];
-  for (let i = 0; i < 26; i++) {
-    const [x, y] = i === 0 ? [400, 110] : inDiamond(110);
-    mk('circle', { class: 'pdot' + (i === 0 ? ' hot' : ''), cx: x.toFixed(1), cy: y.toFixed(1), r: i === 0 ? 6 : (2 + rnd() * 3.5).toFixed(1) }, dots);
-    starts.push([x, y]);
+  const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const ease = x => (x = cl(x), x * x * (3 - 2 * x));
+  const out = x => 1 - Math.pow(1 - cl(x), 3);
+  const lerp2 = (a, b, k) => a + (b - a) * k;
+  // half-height of the double-diamond envelope at x
+  const half = x => x < 215 ? 110 * (x - 30) / 185 : x < 400 ? 110 * (400 - x) / 185 : x < 585 ? 110 * (x - 400) / 185 : 110 * (770 - x) / 185;
+  const Y = (x, v) => 150 + v * half(x) * .8;
+  const T = 25;
+  const outline = $('#ddOutline'), olen = outline.getTotalLength();
+  outline.style.strokeDasharray = olen;
+  const pick = $('#ddPick'), ripple = $('#ddRipple'), product = $('#ddProduct'), thread = $('#ddThread'), tlen = thread.getTotalLength();
+  thread.style.strokeDasharray = tlen;
+  const phs = $$('.ph', el);
+
+  // problems: wandering rings, born at the left tip
+  const probs = [];
+  for (let k = 0; k < 44; k++) {
+    const chosen = k === 0;
+    probs.push({ chosen, tb: chosen ? 1.8 : 1.2 + rnd() * 2.6, hx: chosen ? 250 : 80 + rnd() * 260, hv: chosen ? .12 : rnd() * 2 - 1, d: rnd() * 1.4, r: 2.5 + rnd() * 3.5, ph: rnd() * 6.28,
+      node: mk('circle', { class: 'pb', r: 3 }, $('#ddProblems')) });
   }
-  // layer 2: a small network of "how" nodes
-  const nodes = [[205, 250], [295, 230], [325, 272], [400, 250], [475, 228], [505, 272], [595, 250]];
-  const ng = $('#flowNodes');
-  [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4], [3, 5], [4, 6], [5, 6], [1, 2], [4, 5]].forEach(([a, b]) => mk('line', { class: 'edge', x1: nodes[a][0], y1: nodes[a][1], x2: nodes[b][0], y2: nodes[b][1] }, ng));
-  nodes.forEach(([x, y]) => mk('circle', { class: 'node', cx: x, cy: y, r: 4 }, ng));
-  // flow paths: problem -> nearest node -> a tight point inside the solid product
-  const pg = $('#flowPaths'), pp = $('#flowParticles'), flows = [];
-  starts.forEach(([sx, sy]) => {
-    let n = nodes[0], bd = 1e9;
-    nodes.forEach(m => { const d = Math.abs(m[0] - sx) + rnd() * 120; if (d < bd) { bd = d; n = m; } });
-    const ex = 400 + (rnd() - .5) * 36, ey = 390 + (rnd() - .5) * 14;
-    const d = `M${sx.toFixed(1)} ${sy.toFixed(1)} C${sx.toFixed(1)} ${(sy + 60).toFixed(1)} ${n[0]} ${n[1] - 60} ${n[0]} ${n[1]} S${ex.toFixed(1)} ${(ey - 70).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
-    const path = mk('path', { class: 'fp', d }, pg);
-    flows.push({ path, len: path.getTotalLength(), off: rnd(), sp: .05 + rnd() * .035, dot: mk('circle', { class: 'ptc', r: (1.6 + rnd() * 1.4).toFixed(1), opacity: 0 }, pp) });
-  });
-  return (t, on) => {
-    if (!on) return;
-    flows.forEach(f => {
-      const p = ((t * f.sp + f.off) % 1);
-      const e = p * p * (3 - 2 * p) * .5 + p * .5;
-      const pt = f.path.getPointAtLength(e * f.len);
-      f.dot.setAttribute('cx', pt.x.toFixed(1)); f.dot.setAttribute('cy', pt.y.toFixed(1));
-      f.dot.setAttribute('opacity', (Math.min(p / .12, (1 - p) / .1, 1) * (.35 + .65 * p)).toFixed(2));
-    });
+  // ideas: varied geometric shapes, born at the selected problem
+  const shapes = r => [`M${-r} ${-r}H${r}V${r}H${-r}Z`, `M0 ${-r * 1.2}L${r * 1.1} ${r * .9}H${-r * 1.1}Z`, `M${-r} 0L0 ${-r}L${r} 0L0 ${r}Z`, `M${-r * .35} ${-r}H${r * .35}V${-r * .35}H${r}V${r * .35}H${r * .35}V${r}H${-r * .35}V${r * .35}H${-r}V${-r * .35}H${-r * .35}Z`];
+  const ideas = [];
+  for (let j = 0; j < 38; j++) {
+    const chosen = j === 0, r = 3 + rnd() * 3;
+    ideas.push({ chosen, tc: chosen ? 10.9 : 10.6 + rnd() * 2, hx: chosen ? 540 : 450 + rnd() * 240, hv: chosen ? -.1 : rnd() * 2 - 1, d: rnd() * 1.4, ph: rnd() * 6.28, rot: (rnd() - .5) * 1.4,
+      node: mk('path', { class: 'id', d: shapes(r)[j % 4] }, $('#ddIdeas')) });
+  }
+  const label = (i, on) => phs[i] && phs[i].classList.toggle('on', on);
+  let t = 0, last = null;
+  return (now, active) => {
+    if (!active) { last = null; return; }
+    if (last === null) last = now;
+    t += Math.min(now - last, .25); last = now;
+    const tt = reduce ? 20.5 : t % T;
+    const g = 1 - ease((tt - 23.2) / 1.4);               // loop fade-out
+    outline.style.strokeDashoffset = olen * (1 - ease(tt / 2.4));
+    label(0, tt >= 1.2 && tt < 6.5); label(1, tt >= 6.5 && tt < 10.6); label(2, tt >= 10.6 && tt < 15.2); label(3, tt >= 15.2 && tt < 23.2);
+
+    // 1 + 2: discover (diverge) then define (converge on the waist)
+    for (const p of probs) {
+      const a = out((tt - p.tb) / 2.4);
+      const q = ease((tt - 6.8 - p.d) / 2.6);
+      const wx = Math.sin(tt * .8 + p.ph) * 7 * a * (1 - q), wv = Math.sin(tt * .6 + p.ph * 2) * .06 * a * (1 - q);
+      const x = lerp2(lerp2(30, p.hx, a), 400, q) + wx, v = lerp2(p.hv * a, 0, q) + wv;
+      let op = Math.min(a * 3, 1) * g;
+      if (!p.chosen) op *= 1 - ease((q - .45) / .55); else op = 0;
+      p.node.setAttribute('cx', x.toFixed(1)); p.node.setAttribute('cy', Y(x, v).toFixed(1));
+      p.node.setAttribute('opacity', (op * .75).toFixed(2));
+      if (p.chosen) { p.cx = x; p.cy = Y(x, v); p.q = q; p.a = a; }
+    }
+    // the chosen problem is the last one standing: it becomes a solid point at the waist
+    const c = probs[0], seen = cl(c.a * 2) * g;
+    const pq = c.q;
+    pick.setAttribute('cx', c.cx.toFixed(1)); pick.setAttribute('cy', c.cy.toFixed(1));
+    pick.setAttribute('r', (4 + 3 * pq + (tt > 10.4 ? Math.sin(tt * 2) * .5 : 0)).toFixed(2));
+    pick.setAttribute('opacity', (seen * (.35 + .65 * pq)).toFixed(2));
+    const rp = cl((tt - 9.6) / 1.6);
+    ripple.setAttribute('r', (8 + rp * 46).toFixed(1)); ripple.setAttribute('opacity', (rp > 0 && rp < 1 ? (1 - rp) * .6 * g : 0).toFixed(2));
+
+    // 3 + 4: develop (diverge into ideas) then deliver (converge on the right fit)
+    for (const i of ideas) {
+      const a = out((tt - i.tc) / 2.4);
+      const q = ease((tt - 15.4 - i.d) / 2.6);
+      const wx = Math.sin(tt * .8 + i.ph) * 7 * a * (1 - q), wv = Math.sin(tt * .6 + i.ph * 2) * .06 * a * (1 - q);
+      const x = lerp2(lerp2(400, i.hx, a), 700, q) + wx, v = lerp2(i.hv * a, 0, q) + wv;
+      let op = Math.min(a * 3, 1) * g;
+      if (!i.chosen) op *= 1 - ease((q - .45) / .55); else op *= 1 - ease((tt - 17.6) / .8);
+      i.node.setAttribute('transform', `translate(${x.toFixed(1)} ${Y(x, v).toFixed(1)}) rotate(${((tt * 18 * i.rot) % 360).toFixed(0)})`);
+      i.node.setAttribute('opacity', (op * .8).toFixed(2));
+    }
+    // the right fit settles into a solid product, tied back to the chosen problem
+    const m = ease((tt - 17.4) / 1.2);
+    product.setAttribute('opacity', (m * g).toFixed(2));
+    product.setAttribute('transform', `translate(700 150) scale(${(.7 + .3 * m).toFixed(3)}) translate(-700 -150)`);
+    thread.style.strokeDashoffset = tlen * (1 - ease((tt - 18.3) / 1.3));
+    thread.setAttribute('opacity', (.55 * g).toFixed(2));
   };
 })();
-const flowEl = $('#flow'); let flowVis = false;
-if (flowEl) new IntersectionObserver(es => es.forEach(e => flowVis = e.isIntersecting)).observe(flowEl);
+const ddEl = $('#dd'); let ddVis = false;
+if (ddEl) new IntersectionObserver(es => es.forEach(e => ddVis = e.isIntersecting)).observe(ddEl);
 
 /* ---------- magnetic elements ---------- */
 $$('[data-magnet]').forEach(el => {
@@ -360,7 +406,7 @@ function frame(now) {
   }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
-  if (flowVis && flowEl.classList.contains('in')) flowUpdate(frozen ? 0 : t, true);
+  ddUpdate(now / 1000, ddVis && ddEl.classList.contains('in'));
   if (!frozen || !frame.once) { frame.once = true; }
   requestAnimationFrame(frame);
 }
