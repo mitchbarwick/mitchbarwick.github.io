@@ -183,7 +183,7 @@ $$('[data-magnet]').forEach(el => {
 const rio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); rio.unobserve(en.target); } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
 $$('.rv').forEach(el => rio.observe(el));
 
-/* ---------- WebGL ink field ---------- */
+/* ---------- WebGL cloud field ---------- */
 const canvas = $('#field');
 const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
 let glReady = false, uni = {}, trail = [];
@@ -196,31 +196,39 @@ float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p;a*=.5;}return v;}
+// cloud density: warped fbm that drifts and morphs over time
+float cloud(vec2 p,float t,vec2 w){
+  vec2 q=vec2(fbm(p*.7+vec2(t*.9,0.)+w),fbm(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
+  float d=fbm(p+1.1*q+vec2(t*.6,-t*.25)+w*.5);
+  float cov=fbm(p*.35+vec2(3.1,7.7)+t*.4);          // large-scale coverage: clear gaps vs. banks
+  return smoothstep(.3,.75,d*.9+cov*.6-.1);
+}
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes.y;
-  vec2 p=uv*1.6+vec2(0.,uScroll*.0004);
-  float t=uTime*.06;
-  // pointer trail: swirl + ripples
-  vec2 w=vec2(0.);float rip=0.;
+  vec2 p=uv*1.15+vec2(0.,uScroll*.0003);
+  float t=uTime*.035;
+  // pointer trail gently pushes the clouds
+  vec2 w=vec2(0.);
   for(int i=0;i<${TRAIL};i++){
     vec3 tr=uTrail[i];
-    vec2 d=uv-tr.xy;float r2=dot(d,d);
-    float g=exp(-r2*9.)*tr.z;
+    vec2 d=uv-tr.xy;float g=exp(-dot(d,d)*9.)*tr.z;
     w+=vec2(-d.y,d.x)*g*.5+d*g*.2;
-    rip+=sin(sqrt(r2)*18.-uTime*.8+float(i))*exp(-r2*8.)*tr.z*.25;
   }
-  vec2 q=vec2(fbm(p+t+w),fbm(p+vec2(5.2,1.3)-t));
-  vec2 r=vec2(fbm(p+3.*q+vec2(1.7,9.2)+t*1.3+w*.5),fbm(p+3.*q+vec2(8.3,2.8)-t));
-  float f=fbm(p+3.*r)+rip*.06;
-  float lines=abs(fract(f*8.)-.5);
-  float px=1.6*1.6/uRes.y*8.*1.;
-  float ln=1.-smoothstep(.0,.045+px,lines);
+  float d0=cloud(p,t,w);
+  // light from upper-left: compare density toward the light with density here
+  vec2 L=vec2(-.05,.07);
+  float d1=cloud(p+L,t,w);
+  float lit=clamp(.5+(d0-d1)*9.,0.,1.);               // >.5 facing light, <.5 in shade
+  float thick=smoothstep(.15,1.,d0);                   // dense cores hold more shadow
   vec3 paper=vec3(.972,.965,.945);
   vec3 beige=vec3(.925,.906,.867);
   vec3 ink=vec3(.15);
-  vec3 col=mix(paper,beige,smoothstep(.25,.8,f));
-  col=mix(col,ink,ln*.13);
-  col=mix(col,ink,smoothstep(.62,.95,f)*.07);
+  vec3 sky=mix(beige*.985,beige,smoothstep(0.,1.,uv.y));
+  vec3 bright=vec3(.995,.99,.975);
+  vec3 shade=mix(beige,ink,.2);
+  vec3 cl=mix(shade,bright,lit);
+  cl=mix(cl,mix(beige,shade,.5),thick*.5*(1.-lit)); // darker, denser undersides
+  vec3 col=mix(sky,cl,smoothstep(.02,.55,d0)*.92);
   gl_FragColor=vec4(col,1.);
 }`;
   const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; } return s; };
