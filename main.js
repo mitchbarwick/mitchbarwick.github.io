@@ -113,7 +113,22 @@ $$('.art').forEach(svg => {
 });
 
 /* ---------- hero avatar ---------- */
-const avatar = $('#avatar'), clip = $('#avatarClipPath'), ringEls = $$('.ring', avatar);
+const avatar = $('#avatar'), avVideo = $('#avatarVideo');
+// soft dream-portal edge: the morphing outline is painted blurred into a small canvas and used as the video's alpha mask
+const PM = 160, pc = document.createElement('canvas'); pc.width = pc.height = PM;
+const pctx = pc.getContext('2d');
+let portalFrame = 0;
+function drawPortal(d) {
+  const S = PM * 2, size = cloud.portalSize, blur = cloud.portalBlur * PM;
+  pctx.clearRect(0, 0, PM, PM);
+  pctx.save();
+  pctx.shadowColor = '#000'; pctx.shadowBlur = blur; pctx.shadowOffsetX = S;
+  pctx.translate(-S + PM / 2, PM / 2); pctx.scale(PM * size, PM * size); pctx.translate(-.5, -.5);
+  pctx.fill(new Path2D(d));
+  pctx.restore();
+  const url = `url(${pc.toDataURL()})`;
+  avVideo.style.webkitMaskImage = avVideo.style.maskImage = url;
+}
 const av = { h: harmonics(7), rh: [harmonics(21), harmonics(33), harmonics(45)], x: 0, y: 0, tx: 0, ty: 0, hover: 0 };
 function updateAvatar(t) {
   const r = avatar.getBoundingClientRect();
@@ -126,10 +141,8 @@ function updateAvatar(t) {
   av.hover = lerp(av.hover, near, .025);
   const px = (ptr.x - r.left) / r.width, py = (ptr.y - r.top) / r.height;
   avatar.style.transform = `translate(${av.x}px,${av.y - scrollY * .08}px) rotate(${av.x * .03}deg)`;
-  clip.setAttribute('d', outline({ n: 2.15, amp: .04 + av.hover * .012, t: t * (.9 + av.hover * .1), h: av.h, N: 30, fit: .98, hover: av.hover * .4, px, py }));
-  ringEls.forEach((p, i) => p.setAttribute('d', outline({
-    n: 2.15, amp: .05 + i * .015 + av.hover * .01, t: t * (.7 + av.hover * .1) + i * 1.2, h: av.rh[i], N: 30,
-    fit: 1, scale: 1.08 + i * .1 + av.hover * .01 * (i + 1), hover: av.hover * .3, px, py })));
+  const d = outline({ n: 2.15, amp: .05 + av.hover * .014, t: t * (.9 + av.hover * .1), h: av.h, N: 30, fit: 1, hover: av.hover * .4, px, py });
+  if ((portalFrame++ & 1) === 0) drawPortal(d);
 }
 
 /* ---------- hero name: variable-font letters ---------- */
@@ -190,6 +203,8 @@ let glReady = false, uni = {}, trail = [];
 const TRAIL = 8;
 /* tunable cloud look: [key, label, min, max, step, default, group]. Edit live with /?admin */
 const CLOUD_PARAMS = [
+  ['portalSize', 'Portal size', .4, 1, .01, .8, 'Portal'],
+  ['portalBlur', 'Portal edge softness', .02, .3, .005, .12, 'Portal'],
   ['speed', 'Drift speed', 0, .15, .001, .035, 'Motion'],
   ['morph', 'Morphing (warp)', 0, 3, .01, 1.1, 'Motion'],
   ['pointer', 'Pointer influence', 0, 3, .05, 1, 'Motion'],
