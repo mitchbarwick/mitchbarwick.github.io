@@ -113,29 +113,8 @@ $$('.art').forEach(svg => {
 });
 
 /* ---------- hero avatar ---------- */
-const avatar = $('#avatar'), avVideo = $('#avatarVideo');
-// soft dream-portal edge: the morphing outline is painted blurred onto a canvas, then the video is composited into it (source-in).
-// Drawing the mask and video in one canvas keeps every frame atomic, so the edge never flickers.
-const pc = document.createElement('canvas'); pc.className = 'portal'; pc.setAttribute('aria-hidden', 'true');
-avVideo.after(pc);
-const pctx = pc.getContext('2d');
-function drawPortal(d) {
-  const W = Math.round(avatar.offsetWidth * Math.min(devicePixelRatio || 1, 2));
-  if (!W || !avVideo.videoWidth) return;
-  if (pc.width !== W) pc.width = pc.height = W;
-  const S = W * 2, size = cloud.portalSize;
-  pctx.globalCompositeOperation = 'source-over';
-  pctx.clearRect(0, 0, W, W);
-  pctx.save();
-  pctx.shadowColor = '#000'; pctx.shadowBlur = cloud.portalBlur * W; pctx.shadowOffsetX = S;
-  pctx.translate(-S + W / 2, W / 2); pctx.scale(W * size, W * size); pctx.translate(-.5, -.5);
-  pctx.fill(new Path2D(d));
-  pctx.restore();
-  pctx.globalCompositeOperation = 'source-in';
-  const vw = avVideo.videoWidth, vh = avVideo.videoHeight, k = Math.max(W / vw, W / vh);   // object-fit: cover
-  pctx.drawImage(avVideo, (W - vw * k) / 2, (W - vh * k) / 2, vw * k, vh * k);
-}
-const av = { h: harmonics(7), rh: [harmonics(21), harmonics(33), harmonics(45)], x: 0, y: 0, tx: 0, ty: 0, hover: 0 };
+const avatar = $('#avatar');
+const av = { x: 0, y: 0, tx: 0, ty: 0, hover: 0 };
 function updateAvatar(t) {
   const r = avatar.getBoundingClientRect();
   const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -145,10 +124,7 @@ function updateAvatar(t) {
   const dist = Math.hypot(ptr.x - cx, ptr.y - cy);
   const near = ptr.active ? clamp(1 - dist / (r.width * .9), 0, 1) : 0;
   av.hover = lerp(av.hover, near, .025);
-  const px = (ptr.x - r.left) / r.width, py = (ptr.y - r.top) / r.height;
   avatar.style.transform = `translate(${av.x}px,${av.y - scrollY * .08}px) rotate(${av.x * .03}deg)`;
-  const d = outline({ n: 2.15, amp: .05 + av.hover * .014, t: t * (.9 + av.hover * .1), h: av.h, N: 30, fit: 1, hover: av.hover * .4, px, py });
-  drawPortal(d);
 }
 
 /* ---------- hero name: variable-font letters ---------- */
@@ -209,8 +185,6 @@ let glReady = false, uni = {}, trail = [];
 const TRAIL = 8;
 /* tunable cloud look: [key, label, min, max, step, default, group]. Edit live with /?admin */
 const CLOUD_PARAMS = [
-  ['portalSize', 'Portal size', .4, 1, .01, .8, 'Portal'],
-  ['portalBlur', 'Portal edge softness', .02, .3, .005, .06, 'Portal'],
   ['speed', 'Drift speed', 0, .15, .001, 0.035, 'Motion'],
   ['morph', 'Morphing (warp)', 0, 3, .01, 2.74, 'Motion'],
   ['pointer', 'Pointer influence', 0, 3, .05, 0.7, 'Motion'],
