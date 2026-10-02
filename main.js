@@ -165,7 +165,7 @@ $$('[data-magnet]').forEach(el => {
 });
 
 /* ---------- reveal ---------- */
-const rio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); rio.unobserve(en.target); } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+const rio = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); if (en.target.classList.contains('split') && !reduce) setTimeout(() => en.target.classList.add('live'), 3200); rio.unobserve(en.target); } }), { threshold: .12, rootMargin: '0px 0px -6% 0px' });
 $$('.rv').forEach(el => rio.observe(el));
 
 /* ---------- WebGL cloud field ---------- */
