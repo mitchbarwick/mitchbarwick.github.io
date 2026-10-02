@@ -204,7 +204,7 @@ const TRAIL = 8;
 /* tunable cloud look: [key, label, min, max, step, default, group]. Edit live with /?admin */
 const CLOUD_PARAMS = [
   ['portalSize', 'Portal size', .4, 1, .01, .8, 'Portal'],
-  ['portalBlur', 'Portal edge softness', .02, .3, .005, .12, 'Portal'],
+  ['portalBlur', 'Portal edge softness', .02, .3, .005, .06, 'Portal'],
   ['speed', 'Drift speed', 0, .15, .001, .035, 'Motion'],
   ['morph', 'Morphing (warp)', 0, 3, .01, 1.1, 'Motion'],
   ['pointer', 'Pointer influence', 0, 3, .05, 1, 'Motion'],
