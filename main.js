@@ -227,11 +227,10 @@ float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p;a*=.5;}return v;}
 float fbm3(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<3;i++){v+=a*noise(p);p=m*p;a*=.5;}return v+.0625;}
-// cloud density: warped fbm that drifts and morphs over time
-float cloud(vec2 p,float t,vec2 w){
-  vec2 q=vec2(fbm3(p*.7+vec2(t*.9,0.)+w),fbm3(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
+// cloud density: warped fbm that drifts and morphs over time.
+// q (warp) and cov (banks) are low-frequency, so they are computed once per pixel and reused for the lighting sample.
+float dens(vec2 p,float t,vec2 w,vec2 q,float cov){
   float d=fbm(p+u_morph*q+vec2(t*.6,-t*.25)+w*.5);
-  float cov=fbm3(p*u_bankSize+vec2(3.1,7.7)+t*.4);   // large-scale coverage: clear gaps vs. banks
   return smoothstep(.3,.3+u_softness,d*.9+cov*u_bankStrength+u_coverage);
 }
 void main(){
@@ -246,11 +245,13 @@ void main(){
     w+=vec2(-d.y,d.x)*g*.5+d*g*.2;
   }
   w*=u_pointer;
-  float d0=cloud(p,t,w);
+  vec2 q=vec2(fbm3(p*.7+vec2(t*.9,0.)+w),fbm3(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
+  float cov=fbm3(p*u_bankSize+vec2(3.1,7.7)+t*.4);
+  float d0=dens(p,t,w,q,cov);
   // light: compare density toward the light with density here
   float la=radians(u_lightAngle);
   vec2 L=vec2(cos(la),sin(la))*u_lightDist;
-  float d1=cloud(p+L,t,w);
+  float d1=dens(p+L,t,w,q,cov);
   float lit=clamp(.5+(d0-d1)*u_contrast,0.,1.);        // >.5 facing light, <.5 in shade
   float thick=smoothstep(.15,1.,d0);                   // dense cores hold more shadow
   vec3 paper=vec3(.972,.965,.945);
