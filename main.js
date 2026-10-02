@@ -124,7 +124,7 @@ function updateAvatar(t) {
   const dist = Math.hypot(ptr.x - cx, ptr.y - cy);
   const near = ptr.active ? clamp(1 - dist / (r.width * .9), 0, 1) : 0;
   av.hover = lerp(av.hover, near, .025);
-  avatar.style.transform = `translate(${av.x}px,${av.y - scrollY * .08}px) rotate(${av.x * .03}deg)`;
+  avatar.style.transform = `translate(${av.x}px,${av.y}px) rotate(${av.x * .03}deg)`;
 }
 
 /* ---------- hero name: variable-font letters ---------- */
