@@ -188,10 +188,40 @@ const canvas = $('#field');
 const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
 let glReady = false, uni = {}, trail = [];
 const TRAIL = 8;
+/* tunable cloud look: [key, label, min, max, step, default, group]. Edit live with /?admin */
+const CLOUD_PARAMS = [
+  ['speed', 'Drift speed', 0, .15, .001, .035, 'Motion'],
+  ['morph', 'Morphing (warp)', 0, 3, .01, 1.1, 'Motion'],
+  ['pointer', 'Pointer influence', 0, 3, .05, 1, 'Motion'],
+  ['scale', 'Cloud size (zoom)', .4, 3, .01, 1.15, 'Shape'],
+  ['detail', 'Detail / roughness', .25, .75, .01, .5, 'Shape'],
+  ['coverage', 'Coverage', -.4, .3, .005, -.1, 'Shape'],
+  ['softness', 'Edge softness', .1, 1, .01, .45, 'Shape'],
+  ['bankSize', 'Bank size', .1, 1, .01, .35, 'Shape'],
+  ['bankStrength', 'Bank strength', 0, 1.2, .01, .6, 'Shape'],
+  ['seed', 'Seed', 0, 50, .1, 0, 'Shape'],
+  ['lightAngle', 'Light angle (°)', 0, 360, 1, 125, 'Light'],
+  ['lightDist', 'Light distance', .01, .25, .005, .086, 'Light'],
+  ['contrast', 'Light contrast', 1, 25, .1, 9, 'Light'],
+  ['highlight', 'Highlight brightness', 0, 1, .01, .8, 'Light'],
+  ['shadowDepth', 'Shadow depth', 0, .6, .01, .2, 'Light'],
+  ['underside', 'Dense underside', 0, 1, .01, .5, 'Light'],
+  ['opacity', 'Cloud opacity', 0, 1, .01, .92, 'Sky'],
+  ['skyDark', 'Sky gradient', 0, .1, .001, .015, 'Sky'],
+  ['grain', 'Film grain', 0, .8, .01, .38, 'Sky'],
+];
+const CLOUD_DEFAULTS = Object.fromEntries(CLOUD_PARAMS.map(r => [r[0], r[5]]));
+const cloud = { ...CLOUD_DEFAULTS, ...(() => { try { return JSON.parse(localStorage.getItem('cloudSettings')) || {}; } catch (e) { return {}; } })() };
+const applyGrain = () => document.querySelector('.grain').style.opacity = cloud.grain;
+applyGrain();
+window.__cloud = { params: CLOUD_PARAMS, defaults: CLOUD_DEFAULTS, values: cloud, applyGrain, save() { try { localStorage.setItem('cloudSettings', JSON.stringify(cloud)); } catch (e) {} }, paused: false };
+if (/[?&#]admin/.test(location.search + location.hash)) { const sc = document.createElement('script'); sc.src = 'admin.js'; document.body.appendChild(sc); }
 if (gl) {
   const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   const fs = `precision highp float;
 uniform vec2 uRes;uniform float uTime;uniform float uScroll;uniform vec3 uTrail[${TRAIL}];
+${CLOUD_PARAMS.map(r => `uniform float u_${r[0]};`).join('')}
+
 float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
@@ -199,14 +229,14 @@ float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;
 // cloud density: warped fbm that drifts and morphs over time
 float cloud(vec2 p,float t,vec2 w){
   vec2 q=vec2(fbm(p*.7+vec2(t*.9,0.)+w),fbm(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
-  float d=fbm(p+1.1*q+vec2(t*.6,-t*.25)+w*.5);
-  float cov=fbm(p*.35+vec2(3.1,7.7)+t*.4);          // large-scale coverage: clear gaps vs. banks
-  return smoothstep(.3,.75,d*.9+cov*.6-.1);
+  float d=fbm(p+u_morph*q+vec2(t*.6,-t*.25)+w*.5);
+  float cov=fbm(p*u_bankSize+vec2(3.1,7.7)+t*.4);   // large-scale coverage: clear gaps vs. banks
+  return smoothstep(.3,.3+u_softness,d*.9+cov*u_bankStrength+u_coverage);
 }
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes.y;
-  vec2 p=uv*1.15+vec2(0.,uScroll*.0003);
-  float t=uTime*.035;
+  vec2 p=uv*u_scale+vec2(0.,uScroll*.0003)+u_seed*vec2(1.7,2.3);
+  float t=uTime;
   // pointer trail gently pushes the clouds
   vec2 w=vec2(0.);
   for(int i=0;i<${TRAIL};i++){
@@ -214,21 +244,23 @@ void main(){
     vec2 d=uv-tr.xy;float g=exp(-dot(d,d)*9.)*tr.z;
     w+=vec2(-d.y,d.x)*g*.5+d*g*.2;
   }
+  w*=u_pointer;
   float d0=cloud(p,t,w);
-  // light from upper-left: compare density toward the light with density here
-  vec2 L=vec2(-.05,.07);
+  // light: compare density toward the light with density here
+  float la=radians(u_lightAngle);
+  vec2 L=vec2(cos(la),sin(la))*u_lightDist;
   float d1=cloud(p+L,t,w);
-  float lit=clamp(.5+(d0-d1)*9.,0.,1.);               // >.5 facing light, <.5 in shade
+  float lit=clamp(.5+(d0-d1)*u_contrast,0.,1.);        // >.5 facing light, <.5 in shade
   float thick=smoothstep(.15,1.,d0);                   // dense cores hold more shadow
   vec3 paper=vec3(.972,.965,.945);
   vec3 beige=vec3(.925,.906,.867);
   vec3 ink=vec3(.15);
-  vec3 sky=mix(beige*.985,beige,smoothstep(0.,1.,uv.y));
-  vec3 bright=vec3(.995,.99,.975);
-  vec3 shade=mix(beige,ink,.2);
+  vec3 sky=mix(beige*(1.-u_skyDark),beige,smoothstep(0.,1.,uv.y));
+  vec3 bright=mix(paper,vec3(1.),u_highlight);
+  vec3 shade=mix(beige,ink,u_shadowDepth);
   vec3 cl=mix(shade,bright,lit);
-  cl=mix(cl,mix(beige,shade,.5),thick*.5*(1.-lit)); // darker, denser undersides
-  vec3 col=mix(sky,cl,smoothstep(.02,.55,d0)*.92);
+  cl=mix(cl,mix(beige,shade,.5),thick*u_underside*(1.-lit));
+  vec3 col=mix(sky,cl,smoothstep(.02,.55,d0)*u_opacity);
   gl_FragColor=vec4(col,1.);
 }`;
   const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; } return s; };
@@ -240,7 +272,7 @@ void main(){
       const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      ['uRes', 'uTime', 'uScroll', 'uTrail'].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
+      ['uRes', 'uTime', 'uScroll', 'uTrail', ...CLOUD_PARAMS.map(r => 'u_' + r[0])].forEach(n => uni[n] = gl.getUniformLocation(prog, n));
       glReady = true;
       for (let i = 0; i < TRAIL; i++) trail.push({ x: -5, y: -5, s: 0 });
     }
@@ -259,8 +291,10 @@ addEventListener('resize', resize); resize();
 
 const trailBuf = new Float32Array(TRAIL * 3);
 const calm = { x: .5, y: .5, e: 0, ex: 0, ey: 0 };   // heavily smoothed pointer + "energy" that rises with motion and fades slowly
+let ct = 0;                                          // cloud clock: advances by dt * speed so speed changes never jump
 function drawField(t, dt) {
   if (!glReady) return;
+  if (!__cloud.paused && !frozen) ct += dt * cloud.speed;
   const tx = ptr.x / innerHeight, ty = 1 - ptr.y / innerHeight;
   const k = 1 - Math.pow(.12, dt);                    // slow follow
   calm.x = lerp(calm.x, tx, k); calm.y = lerp(calm.y, ty, k);
@@ -273,7 +307,8 @@ function drawField(t, dt) {
     trailBuf[i * 3 + 2] = calm.e * .32 * (1 - f);
   }
   gl.uniform2f(uni.uRes, canvas.width, canvas.height);
-  gl.uniform1f(uni.uTime, t);
+  gl.uniform1f(uni.uTime, ct);
+  for (const r of CLOUD_PARAMS) gl.uniform1f(uni['u_' + r[0]], cloud[r[0]]);
   gl.uniform1f(uni.uScroll, scrollY);
   gl.uniform3fv(uni.uTrail, trailBuf);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
