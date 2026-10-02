@@ -152,6 +152,26 @@ function updateName(t) {
   });
 }
 
+/* ---------- sea of AI slop ---------- */
+(() => {
+  const sea = $('#slopSea'); if (!sea) return;
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const rows = 7, perRow = 22;
+  let n = 0;
+  for (let r = 0; r < rows; r++) {
+    for (let k = 0; k < perRow; k++) {
+      const w = 16 + rnd() * 20, h = w * (.7 + rnd() * .5);
+      const x = (k + rnd() * .8) * (800 / perRow) + (r % 2) * 18 - 10, y = 282 + r * 24 + rnd() * 10;
+      if (Math.hypot(x + w / 2 - 400, y + h / 2 - 350) < 34) continue;   // keep clear around the target
+      const el = document.createElementNS(NS, 'rect');
+      el.setAttribute('class', 's'); el.setAttribute('x', x.toFixed(1)); el.setAttribute('y', y.toFixed(1));
+      el.setAttribute('width', w.toFixed(1)); el.setAttribute('height', h.toFixed(1)); el.setAttribute('rx', (2 + rnd() * 6).toFixed(1));
+      el.style.cssText = `--i:${n++};--o:${(.08 + rnd() * .16 + r * .012).toFixed(2)};--t:${(4 + rnd() * 4).toFixed(1)}s;--dl:${(-rnd() * 6).toFixed(1)}s;--y:${(rnd() < .5 ? -1 : 1) * (3 + rnd() * 4)}px`;
+      sea.appendChild(el);
+    }
+  }
+})();
+
 /* ---------- magnetic elements ---------- */
 $$('[data-magnet]').forEach(el => {
   if (!finePointer) return;

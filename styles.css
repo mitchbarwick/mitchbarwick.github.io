@@ -119,13 +119,13 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 
 /* layers */
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,34px);margin-top:clamp(40px,6vw,80px)}
-.layer{padding:clamp(28px,3vw,48px) clamp(24px,2.6vw,40px) clamp(32px,3.4vw,52px);min-height:20rem;display:flex;flex-direction:column}
+.layer{padding:1.4rem 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column}
 .layer:nth-child(2){margin-top:clamp(0px,4vw,60px)}
 .layer:nth-child(3){margin-top:clamp(0px,8vw,120px)}
 .layer .num,.card .num{color:var(--ink-2)}
-.layer h3{font-size:clamp(1.9rem,3vw,2.8rem);font-weight:300;letter-spacing:-.03em;margin:auto 0 .6rem;padding-top:3rem}
+.layer h3{font-size:clamp(1.9rem,3vw,2.8rem);font-weight:300;letter-spacing:-.03em;margin:1.6rem 0 .6rem}
 .layer p,.card p{color:var(--ink-2);font-size:.92em;line-height:1.5}
-@media (max-width:820px){.layers{grid-template-columns:1fr}.layer{min-height:0}.layer:nth-child(n){margin-top:0}.layer h3{padding-top:1.5rem}}
+@media (max-width:820px){.layers{grid-template-columns:1fr}.layer:nth-child(n){margin-top:0}}
 
 /* cards */
 .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(18px,3vw,44px);margin-top:clamp(40px,6vw,80px)}
@@ -187,3 +187,38 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
   .name .l{transition:none}
 }
 .settled .name .l{transition:opacity 1s}
+
+/* strategic pitch: emphasis */
+.layer .pitch{color:var(--ink);font-size:1em}
+.layer .pitch strong{font-weight:600}
+.layer .pitch em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1;background:linear-gradient(transparent 62%,rgba(38,38,38,.14) 0)}
+
+/* precise product above a sea of AI slop */
+.slop{position:relative;max-width:900px;margin:clamp(48px,7vw,96px) auto clamp(24px,4vw,48px);aspect-ratio:800/460}
+.slop svg{display:block;width:100%;height:100%;overflow:visible}
+.slop .surface{fill:none;stroke:var(--ink);stroke-width:1;opacity:.22;vector-effect:non-scaling-stroke}
+.slop .s{fill:var(--ink);opacity:0;transition:opacity 1.2s ease calc(var(--i) * 9ms + .5s)}
+.slop.in .s{opacity:var(--o);animation:bob var(--t) ease-in-out var(--dl) infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(var(--y))}}
+.slop .diamond{fill:var(--ink)}
+.slop .ring{fill:none;stroke:var(--bg);stroke-width:1.2;opacity:.8}
+.slop .core{fill:var(--bg)}
+.slop .prod{opacity:0;transform:translateY(-40px);transition:opacity 1s ease 1.2s,transform 1.6s var(--ease) 1.2s}
+.slop.in .prod{opacity:1;transform:none;animation:hover 6s ease-in-out 3s infinite}
+@keyframes hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.slop .beam{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:140;stroke-dashoffset:140;vector-effect:non-scaling-stroke;transition:stroke-dashoffset 1.2s var(--ease) 2.2s}
+.slop.in .beam{stroke-dashoffset:0}
+.slop .target{opacity:0;transition:opacity .6s ease 3.2s}
+.slop.in .target{opacity:1}
+.slop .dot{fill:var(--ink)}
+.slop .ripple{fill:none;stroke:var(--ink);stroke-width:1;transform-box:fill-box;transform-origin:center;opacity:0}
+.slop.in .ripple{animation:ripple 3s ease-out 3.4s infinite}
+.slop.in .r2{animation-delay:4.4s}
+@keyframes ripple{0%{transform:scale(.8);opacity:.7}100%{transform:scale(4.5);opacity:0}}
+.slop .lab{position:absolute;color:var(--ink-2);white-space:nowrap;text-shadow:0 0 6px var(--bg),0 0 6px var(--bg),0 0 10px var(--bg);opacity:0;transition:opacity 1s ease 3s}
+.slop.in .lab{opacity:1}
+.lab-prod{left:62%;top:27%}
+.lab-target{left:55%;top:73%}
+.lab-sea{left:0;bottom:-9%}
+@media (max-width:560px){.slop .lab{font-size:.6rem}.lab-prod{left:60%}.slop .lab-target{left:55%;white-space:normal;width:40%;line-height:1.35}}
+@media (prefers-reduced-motion:reduce){.slop *{animation:none!important}}
