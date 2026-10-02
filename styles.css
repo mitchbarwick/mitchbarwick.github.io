@@ -42,6 +42,9 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 .nav nav a::after{content:"";position:absolute;left:4px;right:4px;bottom:2px;height:1px;background:currentColor;
   transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
 .nav nav a:hover::after{transform:scaleX(1)}
+.nav .home{display:inline-flex;align-items:center}
+.nav .home svg{display:block}
+.nav nav a.home::after{display:none}
 .mark{font-weight:500}
 @media (max-width:560px){.nav .mark{display:none}.nav{justify-content:center}}
 
