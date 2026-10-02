@@ -205,25 +205,25 @@ const TRAIL = 8;
 const CLOUD_PARAMS = [
   ['portalSize', 'Portal size', .4, 1, .01, .8, 'Portal'],
   ['portalBlur', 'Portal edge softness', .02, .3, .005, .06, 'Portal'],
-  ['speed', 'Drift speed', 0, .15, .001, .035, 'Motion'],
-  ['morph', 'Morphing (warp)', 0, 3, .01, 1.1, 'Motion'],
-  ['pointer', 'Pointer influence', 0, 3, .05, 1, 'Motion'],
-  ['scale', 'Cloud size (zoom)', .4, 3, .01, 1.15, 'Shape'],
-  ['detail', 'Detail / roughness', .25, .75, .01, .5, 'Shape'],
-  ['coverage', 'Coverage', -.4, .3, .005, -.1, 'Shape'],
-  ['softness', 'Edge softness', .1, 1, .01, .45, 'Shape'],
-  ['bankSize', 'Bank size', .1, 1, .01, .35, 'Shape'],
-  ['bankStrength', 'Bank strength', 0, 1.2, .01, .6, 'Shape'],
-  ['seed', 'Seed', 0, 50, .1, 0, 'Shape'],
-  ['lightAngle', 'Light angle (°)', 0, 360, 1, 125, 'Light'],
-  ['lightDist', 'Light distance', .01, .25, .005, .086, 'Light'],
-  ['contrast', 'Light contrast', 1, 25, .1, 9, 'Light'],
-  ['highlight', 'Highlight brightness', 0, 1, .01, .8, 'Light'],
-  ['shadowDepth', 'Shadow depth', 0, .6, .01, .2, 'Light'],
-  ['underside', 'Dense underside', 0, 1, .01, .5, 'Light'],
-  ['opacity', 'Cloud opacity', 0, 1, .01, .92, 'Sky'],
-  ['skyDark', 'Sky gradient', 0, .1, .001, .015, 'Sky'],
-  ['grain', 'Film grain', 0, .8, .01, .38, 'Sky'],
+  ['speed', 'Drift speed', 0, .15, .001, 0.035, 'Motion'],
+  ['morph', 'Morphing (warp)', 0, 3, .01, 2.74, 'Motion'],
+  ['pointer', 'Pointer influence', 0, 3, .05, 0.7, 'Motion'],
+  ['scale', 'Cloud size (zoom)', .4, 3, .01, 1.56, 'Shape'],
+  ['detail', 'Detail / roughness', .25, .75, .01, 0.66, 'Shape'],
+  ['coverage', 'Coverage', -.4, .3, .005, -0.255, 'Shape'],
+  ['softness', 'Edge softness', .1, 1, .01, 0.36, 'Shape'],
+  ['bankSize', 'Bank size', .1, 1, .01, 0.76, 'Shape'],
+  ['bankStrength', 'Bank strength', 0, 1.2, .01, 0.67, 'Shape'],
+  ['seed', 'Seed', 0, 50, .1, 19.2, 'Shape'],
+  ['lightAngle', 'Light angle (°)', 0, 360, 1, 121, 'Light'],
+  ['lightDist', 'Light distance', .01, .25, .005, 0.045, 'Light'],
+  ['contrast', 'Light contrast', 1, 25, .1, 10.2, 'Light'],
+  ['highlight', 'Highlight brightness', 0, 1, .01, 0.46, 'Light'],
+  ['shadowDepth', 'Shadow depth', 0, .6, .01, 0.15, 'Light'],
+  ['underside', 'Dense underside', 0, 1, .01, 0.88, 'Light'],
+  ['opacity', 'Cloud opacity', 0, 1, .01, 0.98, 'Sky'],
+  ['skyDark', 'Sky gradient', 0, .1, .001, 0.02, 'Sky'],
+  ['grain', 'Film grain', 0, .8, .01, 0.29, 'Sky'],
 ];
 const CLOUD_DEFAULTS = Object.fromEntries(CLOUD_PARAMS.map(r => [r[0], r[5]]));
 const cloud = { ...CLOUD_DEFAULTS, ...(() => { try { return JSON.parse(localStorage.getItem('cloudSettings')) || {}; } catch (e) { return {}; } })() };
@@ -241,11 +241,12 @@ float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract
 float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p;a*=.5;}return v;}
+float fbm3(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<3;i++){v+=a*noise(p);p=m*p;a*=.5;}return v+.0625;}
 // cloud density: warped fbm that drifts and morphs over time
 float cloud(vec2 p,float t,vec2 w){
-  vec2 q=vec2(fbm(p*.7+vec2(t*.9,0.)+w),fbm(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
+  vec2 q=vec2(fbm3(p*.7+vec2(t*.9,0.)+w),fbm3(p*.7+vec2(5.2,1.3)-vec2(0.,t*.7)));
   float d=fbm(p+u_morph*q+vec2(t*.6,-t*.25)+w*.5);
-  float cov=fbm(p*u_bankSize+vec2(3.1,7.7)+t*.4);   // large-scale coverage: clear gaps vs. banks
+  float cov=fbm3(p*u_bankSize+vec2(3.1,7.7)+t*.4);   // large-scale coverage: clear gaps vs. banks
   return smoothstep(.3,.3+u_softness,d*.9+cov*u_bankStrength+u_coverage);
 }
 void main(){
@@ -293,15 +294,14 @@ void main(){
     }
   }
 }
-let scale = 1;
+let renderScale = innerWidth < 700 ? .3 : .35;       // fraction of CSS pixels; the clouds are soft, so upscaling is invisible
 function resize() {
-  const small = innerWidth < 700;
-  scale = small ? .5 : .6;
-  const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  canvas.width = Math.round(innerWidth * dpr * scale);
-  canvas.height = Math.round(innerHeight * dpr * scale);
+  canvas.width = Math.max(2, Math.round(innerWidth * renderScale));
+  canvas.height = Math.max(2, Math.round(innerHeight * renderScale));
   if (glReady) gl.viewport(0, 0, canvas.width, canvas.height);
+  needsDraw = true;
 }
+let needsDraw = true;
 addEventListener('resize', resize); resize();
 
 const trailBuf = new Float32Array(TRAIL * 3);
@@ -330,7 +330,7 @@ function drawField(t, dt) {
 }
 
 /* ---------- loop ---------- */
-let last = performance.now(), t = 0, frozen = reduce;
+let last = performance.now(), t = 0, frozen = reduce, fieldAcc = 0, fieldScroll = -1, slow = 0;
 function frame(now) {
   const dt = Math.min((now - last) / 1000, .05); last = now;
   if (!frozen) t += dt;
@@ -338,7 +338,14 @@ function frame(now) {
   scrollY = window.scrollY;
   scrollVel = lerp(scrollVel, clamp(Math.abs(scrollY - lastScroll) / Math.max(dt, .001) * .05, 0, 120), .1); lastScroll = scrollY;
 
-  drawField(t, dt);
+  fieldAcc += dt;
+  if (fieldAcc >= 1 / 30 - .002 && (!frozen || needsDraw || scrollY !== fieldScroll)) {
+    drawField(t, Math.min(fieldAcc, .1));
+    fieldAcc = 0; needsDraw = false; fieldScroll = scrollY;
+    // adaptive: if the page can't keep up, shrink the cloud resolution a little
+    slow = slow * .95 + (dt > .045 ? 1 : 0) * .05;
+    if (slow > .5 && renderScale > .2) { renderScale *= .85; slow = 0; resize(); }
+  }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
   updateMarquee(frozen ? 0 : dt);
@@ -347,7 +354,7 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 
-document.addEventListener('visibilitychange', () => { last = performance.now(); });
+document.addEventListener('visibilitychange', () => { last = performance.now(); fieldAcc = 0; });
 
 /* intro */
 const vid = $('#avatarVideo');
