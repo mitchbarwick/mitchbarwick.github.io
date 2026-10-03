@@ -248,3 +248,7 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 /* recognition: article list */
 .arts{display:flex;flex-direction:column;gap:.5rem;color:var(--ink-2);font-size:.92em}
 .arts i{font-style:normal;margin-left:.4rem;font-size:.62rem;color:var(--ink-2)}
+
+/* hero intro emphasis */
+.lede strong{font-weight:600;color:var(--ink)}
+.lede em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1;background:linear-gradient(transparent 62%,rgba(38,38,38,.14) 0)}
