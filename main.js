@@ -286,8 +286,9 @@ function resize() {
   canvas.height = Math.max(2, Math.round(innerHeight * renderScale));
   if (glReady) gl.viewport(0, 0, canvas.width, canvas.height);
   needsDraw = true;
+  if (loopStarted) drawField(t, 0);   // resizing clears the canvas to black; repaint in the same task so it never shows
 }
-let needsDraw = true;
+let needsDraw = true, loopStarted = false;
 addEventListener('resize', resize); resize();
 
 const trailBuf = new Float32Array(TRAIL * 3);
@@ -313,6 +314,7 @@ function drawField(t, dt) {
   gl.uniform1f(uni.uScroll, scrollY);
   gl.uniform3fv(uni.uTrail, trailBuf);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
+  if (!drawField.shown) { drawField.shown = true; canvas.classList.add('ready'); }
 }
 
 /* ---------- loop ---------- */
@@ -330,7 +332,7 @@ function frame(now) {
     fieldAcc = 0; needsDraw = false; fieldScroll = scrollY;
     // adaptive: if the page can't keep up, shrink the cloud resolution a little
     slow = slow * .95 + (dt > .045 ? 1 : 0) * .05;
-    if (slow > .5 && renderScale > .2) { renderScale *= .85; slow = 0; resize(); }
+    if (now > 4000 && slow > .6 && renderScale > .22) { renderScale *= .85; slow = 0; resize(); }
   }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
@@ -338,6 +340,8 @@ function frame(now) {
   if (!frozen || !frame.once) { frame.once = true; }
   requestAnimationFrame(frame);
 }
+loopStarted = true;
+if (!glReady) canvas.classList.add("ready");   // no WebGL: show the CSS gradient fallback
 requestAnimationFrame(frame);
 
 document.addEventListener('visibilitychange', () => { last = performance.now(); fieldAcc = 0; });
