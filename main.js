@@ -414,6 +414,23 @@ function resize() {
 let needsDraw = true, loopStarted = false;
 addEventListener('resize', resize); resize();
 
+/* ring text: keep it ~9–12px on screen at any avatar size, and repeat the phrase to fill the circle */
+const ringSvg = $('.ring-text'), ringTp = $('#ringTextPath');
+const RING_PHRASE = 'Principal Designer · Video at Microsoft · Newcastle, AU · ';
+function sizeRing() {
+  if (!ringSvg) return;
+  const w = avatar.offsetWidth * 1.28, unit = w / 100;          // px per viewBox unit
+  const px = clamp(w / 48, 9, 12), fs = px / unit;
+  const circ = 2 * Math.PI * 44;                                  // in viewBox units
+  const natural = RING_PHRASE.length * fs * .68;                  // rough mono advance incl. tracking
+  const reps = Math.max(1, Math.floor(circ / (natural * 1.15)));
+  const txt = RING_PHRASE.repeat(reps).trimEnd();                // ends on "·" so the seam reads like every other gap
+  ringTp.textContent = txt;
+  ringTp.parentNode.style.fontSize = fs.toFixed(3) + 'px';             // inline style: beats .mono's rem size
+  ringTp.setAttribute('textLength', (circ * txt.length / (txt.length + 1)).toFixed(1));
+}
+addEventListener('resize', sizeRing); sizeRing();
+
 const trailBuf = new Float32Array(TRAIL * 3);
 const calm = { x: .5, y: .5, e: 0, ex: 0, ey: 0 };   // heavily smoothed pointer + "energy" that rises with motion and fades slowly
 let ct = 0;                                          // cloud clock: advances by dt * speed so speed changes never jump
