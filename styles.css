@@ -153,7 +153,8 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
 .edu .label{color:var(--ink-2);margin-bottom:.6rem}
 .edu h3{font-weight:300;font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;margin-bottom:.4rem}
 .edu p:last-child{color:var(--ink-2)}
-@media (max-width:820px){.path-grid{grid-template-columns:1fr}.side{position:static}.timeline li{grid-template-columns:1fr;gap:0}.when{padding:0 0 .2rem}
+@media (max-width:820px){.path-grid{grid-template-columns:1fr}.side{position:static}.timeline li{grid-template-columns:1fr;gap:0}.when{padding:0 0 .2rem}}
+
 /* voice */
 .voice-list{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,34px);margin-top:clamp(40px,6vw,80px)}
 .voice{padding:clamp(26px,2.8vw,40px);min-height:17rem;display:flex;flex-direction:column;gap:.6rem}
