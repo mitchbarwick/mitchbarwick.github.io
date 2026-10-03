@@ -151,7 +151,7 @@ Supporting material: Opus, nib, Orica, freelance, mobile, community.
 
 Single page (keep it that way for now). Nav: Now · Practice · Work · Path · Contact.
 
-0. **Hero:** eyebrow "Design leader · AI video at Microsoft · Newcastle, AU", hybrid-role paragraph, 50/50 split (Design Manager / Product Strategist).
+0. **Hero:** eyebrow "Principal Designer · Video at Microsoft · Newcastle, AU", hybrid-role paragraph, 50/50 split (Design Manager / Product Strategist).
 1. **01 Now:** "Two halves, one role." Design Manager half (AI video creation, editor, mobile; Head of Design (Interim) 2024–25; experienced, candid and kind). Product Strategist half (Clipchamp video creation in Microsoft 365 Copilot; link to hackathon awards).
 2. **02 Practice:** "Onions have layers." Strategic / Structural / Surface, double-diamond animation, three principles (30/60/90, evidence beats opinion, design makes engineering faster).
 3. **03 Selected work:** Greater Bank story (establishing UX, research, persona survey, customers in sprints), "What we shipped" cards, Disliked design story.
