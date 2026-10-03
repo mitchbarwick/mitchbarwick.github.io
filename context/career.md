@@ -51,7 +51,7 @@ Everything tagged `SITE` is authoritative.
 | 2004 – 2008 | University of Newcastle | Bachelor of Information Technology, Design & Visual Communications | `SITE` |
 | 2012 – 2019 | Metford Cobras FC | Publicity & Sponsorship Officer | `DUMP` (not on site) |
 | 2019 – 2020 | Metford Cobras FC | Digital Media Officer | `DUMP` |
-| Sep 2025 – now | Metford Cobras FC | President | `DUMP` (site only says "Volunteering … since 2012") |
+| Sep 2025 – now | Metford Cobras FC | President | `SITE` (approved Oct 2026) |
 
 ### Reconciliation rule
 
@@ -59,11 +59,10 @@ Everything tagged `SITE` is authoritative.
 
 - Dates and titles above (nib, Orica, Greater Bank, Microsoft, earlier roles) are as published. The dump's missing or different dates, its freelance-straight-after-uni framing, its "Design Manager" title, its "late 2022" Microsoft start and its "Head of Product" cover claim are all superseded by the site.
 - Podcast name is **Newy Tech People** (not "Newcastle Tech People").
-- Metford Cobras: the site only says "Volunteering … since 2012". The specific officer roles and the 2025 presidency come from club-published information and are not on the site yet. Add only if Mitchell wants them.
+- Metford Cobras: presidency since September 2025 is approved and on the site. The earlier officer roles are not on the site.
 
 ### Still open (not conflicts, just missing)
 
-- `GAP` ABM publications: Mitchell mentioned these. Need publisher, title(s), year(s), link and a one-line description.
 - `GAP` What Mitchell actually did on the Opus magazine (NEWi Award 2016, with Hyperweb Communications).
 - `GAP` The exact date of the Greater Bank UX Designer to Principal Designer step.
 
@@ -97,13 +96,13 @@ Already on the site under Selected work: digital transformation, design system a
 ## 5. Microsoft Clipchamp (public-safe only)
 
 - Public profile line: leading product design for AI video creation, editor experience and mobile. `PUBLIC`
-- Part of the team behind Clipchamp video creation inside Microsoft 365 Copilot / Visual Creator (start from a prompt, generate a draft, keep editing in Clipchamp). `PUBLIC`
+- Part of the team behind Clipchamp video creation inside Microsoft 365 Copilot (start from a prompt, get a first draft, keep editing in Clipchamp). `PUBLIC`, approved to name Copilot.
 - Celebrated the redesigned Clipchamp iOS app launch. `PUBLIC`
 - Public posts amplifying editor improvements (e.g. grouping and timeline work), and collaboration on converging Clipchamp and Stream in Microsoft 365. `PUBLIC`
 - First-year Clipchamp post describes the role as 100% remote, and mentions MVPs, learning from real use and iterating. `PUBLIC`
 - Leadership philosophy, from the public Design Manager recruiting content: mentor experienced designers, support career growth, focus teams on the most important problems, champion agile delivery, define design practice, stay hands-on, craft products that feel beautifully made. Looking for people who are **experienced, candid and kind**. `PUBLIC`
 - A colleague publicly credited Mitchell as an ally and champion of women in tech when she was a 2025 Women in Digital Technical Leader finalist. `PUBLIC`
-- Guiding ideas he uses publicly: model-first rather than tool-first creation; *output is the product*. `SELF` (check wording before publishing)
+- Do **not** publish the phrases "Visual Creator" or "output is the product" (Mitchell, Oct 2026).
 - Remote leadership story: leading globally significant product design from Newcastle, not a tech hub. `SELF`
 - **Microsoft Hackathon awards** (on site): `SITE`
   - The Microsoft Hackathon is a biannual event where all Microsoft employees stop for a week to compete for the most unique and potentially valuable new idea, as long as it can be hacked together in five days. (Biannual is correct. Do not change to "biennial".)
@@ -115,10 +114,12 @@ Already on the site under Selected work: digital transformation, design system a
 | Item | Detail | Status |
 | --- | --- | --- |
 | NEWi Award, Sep 2016 | Best Online Publication, Opus magazine (University of Newcastle) with Hyperweb Communications | `SITE`, `PUBLIC` (LinkedIn) |
-| UX Australia talk, 2017 | "Disliked design: Delivering bad news through good UX" | `SITE`, `PUBLIC` |
+| UX Australia, 10 Aug 2017 | "Disliked design: Delivering bad news through good UX". LinkedIn summary opens: "We aim for delightful experiences, but sometimes delight isn't on the menu." | `SITE`, `PUBLIC` |
 | Newy Tech People podcast #44, 2020 | Building a design team, advice for junior designers | `SITE`, `PUBLIC` |
 | Hackathon awards 2024 and 2026 | See section 5 | `SITE` |
-| ABM publications | Unknown | `GAP` |
+| Aboriginal Business Magazine, Jan 2012 | "Crowd Control: The rise of crowd sourcing in design." | `SITE`, `PUBLIC` (LinkedIn) |
+| Aboriginal Business Magazine, Jun 2012 | "Responsive Web Design" | `SITE`, `PUBLIC` (LinkedIn) |
+| Aboriginal Business Magazine, Nov 2012 | "Should I be blogging?" | `SITE`, `PUBLIC` (LinkedIn) |
 
 The "Disliked design" premise: designers chase delight, but some experiences inherently deliver news users don't want. The case involved angry users, a demoralised team and ambiguous goals. Modern framing idea: *designing experiences users are supposed to dislike.* `DUMP`
 
@@ -148,7 +149,15 @@ Supporting material: Opus, nib, Orica, freelance, mobile, community.
 
 ## 10. What the site currently says
 
-Sections: Practice (Strategic / Structural / Surface layers, double-diamond animation), Selected work (six Greater Bank stories, "Clipchamp stories are next"), Path (timeline above, education, Metford Cobras), Voice (Awards, Publications), Contact (LinkedIn).
+Single page (keep it that way for now). Nav: Now · Practice · Work · Path · Contact.
+
+0. **Hero:** eyebrow "Design leader · AI video at Microsoft · Newcastle, AU", hybrid-role paragraph, 50/50 split (Design Manager / Product Strategist).
+1. **01 Now:** "Two halves, one role." Design Manager half (AI video creation, editor, mobile; Head of Design (Interim) 2024–25; experienced, candid and kind). Product Strategist half (Clipchamp video creation in Microsoft 365 Copilot; link to hackathon awards).
+2. **02 Practice:** "Onions have layers." Strategic / Structural / Surface, double-diamond animation, three principles (30/60/90, evidence beats opinion, design makes engineering faster).
+3. **03 Selected work:** Greater Bank story (establishing UX, research, persona survey, customers in sprints), "What we shipped" cards, Disliked design story.
+4. **04 Path:** origin line, timeline, education, Metford Cobras president.
+5. **05 Recognition:** "Said, written and won." Awards (Hackathon explainer, 2026, 2024, NEWi 2016). Publications (podcast, UX Australia, Aboriginal Business Magazine 2012 articles).
+6. **06 Contact.**
 
 ## 11. Voice and copy conventions
 
