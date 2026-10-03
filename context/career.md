@@ -35,7 +35,7 @@ Candidate headline territory (not published): *Design leader building the next g
 
 ## 2. Timeline
 
-Dates and titles in the first column group come from the site and are authoritative.
+Everything tagged `SITE` is authoritative.
 
 | Period | Organisation | Title | Status |
 | --- | --- | --- | --- |
@@ -49,20 +49,23 @@ Dates and titles in the first column group come from the site and are authoritat
 | 2008 – 2010 | Urban Group Australia | Graphic Designer | `SITE` |
 | 2007 – 2008 | Ovesco | Junior Designer | `SITE` |
 | 2004 – 2008 | University of Newcastle | Bachelor of Information Technology, Design & Visual Communications | `SITE` |
-| 2012 – 2019 | Metford Cobras FC | Publicity & Sponsorship Officer | `DUMP` (club-published) |
+| 2012 – 2019 | Metford Cobras FC | Publicity & Sponsorship Officer | `DUMP` (not on site) |
 | 2019 – 2020 | Metford Cobras FC | Digital Media Officer | `DUMP` |
 | Sep 2025 – now | Metford Cobras FC | President | `DUMP` (site only says "Volunteering … since 2012") |
 
-### Conflicts and gaps to resolve
+### Reconciliation rule
 
-- `GAP` The dump says it couldn't find dates for nib, Orica, Greater Bank or Microsoft. The site already has them, so the site wins. Worth confirming the Greater Bank UX Designer → Principal Designer switch date.
-- `GAP` The dump implies freelance work straight after university (roughly six years). The site shows Ovesco (2007–08), Urban Group (2008–10), then NATIV (2010–16). Likely the dump is imprecise. Confirm.
-- `GAP` The dump has a 2024 public recruiting video naming Mitchell **Design Manager**. The site has Senior Design Manager 2023–24. Confirm which title was current when.
-- `GAP` The dump says Microsoft started "late 2022 / early 2023" (first-year post at end of 2023). Site says 2023.
-- `GAP` The dump mentions covering the Head of Product role for ~a year. The site says Head of Design (Interim) 2024–25. These are different claims. Do not publish the Head of Product one without confirmation.
-- `GAP` Podcast name: dump says "Newcastle Tech People". Site and URL say **Newy Tech People** (newytechpeople.com.au). Keep the site's.
-- `GAP` ABM publications: Mitchell mentioned these. The dump has nothing. Need publisher, title(s), year(s), link, one-line description.
+**Where the dump and the site disagree, the site is accurate.** Do not "fix" the site from the dump.
+
+- Dates and titles above (nib, Orica, Greater Bank, Microsoft, earlier roles) are as published. The dump's missing or different dates, its freelance-straight-after-uni framing, its "Design Manager" title, its "late 2022" Microsoft start and its "Head of Product" cover claim are all superseded by the site.
+- Podcast name is **Newy Tech People** (not "Newcastle Tech People").
+- Metford Cobras: the site only says "Volunteering … since 2012". The specific officer roles and the 2025 presidency come from club-published information and are not on the site yet. Add only if Mitchell wants them.
+
+### Still open (not conflicts, just missing)
+
+- `GAP` ABM publications: Mitchell mentioned these. Need publisher, title(s), year(s), link and a one-line description.
 - `GAP` What Mitchell actually did on the Opus magazine (NEWi Award 2016, with Hyperweb Communications).
+- `GAP` The exact date of the Greater Bank UX Designer to Principal Designer step.
 
 ## 3. Origin and early career
 
