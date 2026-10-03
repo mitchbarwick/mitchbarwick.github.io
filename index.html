@@ -85,13 +85,22 @@
     </div>
     <figure class="dd rv" id="dd" aria-label="Animated double diamond: exploring many problems, narrowing to the one most worth solving, exploring many possible solutions, then narrowing to the right fit.">
       <svg viewBox="0 0 800 300" aria-hidden="true">
-        <path id="ddOutline" class="outline" d="M30 150 L215 40 L400 150 L585 40 L770 150 L585 260 L400 150 L215 260 Z"/>
-        <path id="ddThread" class="thread" opacity="0" d="M400 150 L668 150"/>
+        <defs>
+          <linearGradient id="ddTrail" x1="0" x2="1"><stop offset="0" stop-color="#262626" stop-opacity="0"/><stop offset="1" stop-color="#262626" stop-opacity=".12"/></linearGradient>
+          <clipPath id="ddClip"><path id="ddClipPath"/></clipPath>
+        </defs>
+        <path id="ddOutline" class="outline"/>
+        <g clip-path="url(#ddClip)"><g id="ddScanG" opacity="0"><rect id="ddTrailRect" y="20" width="80" height="260" fill="url(#ddTrail)"/><line id="ddScan" class="scan" y1="20" y2="280"/></g></g>
+        <line id="ddThread" class="thread" x1="409" y1="150" x2="409" y2="150" opacity="0"/>
         <g id="ddProblems"></g>
         <g id="ddIdeas"></g>
         <circle id="ddPick" class="pick" opacity="0" cx="400" cy="150" r="6"/>
         <circle id="ddRipple" class="ripple" opacity="0" cx="400" cy="150" r="8"/>
-        <g id="ddProduct" class="product" opacity="0"><path class="pd" d="M700 122 L728 150 L700 178 L672 150 Z"/><circle class="core" cx="700" cy="150" r="6"/></g>
+        <g id="ddCube" opacity="0">
+          <path class="cf ct" d="M0 -30L26 -15L0 0L-26 -15Z"/>
+          <path class="cf cl" d="M-26 -15L0 0L0 30L-26 15Z"/>
+          <path class="cf cr" d="M0 0L26 -15L26 15L0 30Z"/>
+        </g>
       </svg>
       <span class="ph mono" style="left:15.3%">Discover</span>
       <span class="ph mono" style="left:38.4%">Define</span>

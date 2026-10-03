@@ -155,36 +155,57 @@ function updateName(t) {
 /* ---------- double diamond: discover -> define -> develop -> deliver ---------- */
 const ddUpdate = (() => {
   const el = $('#dd'); if (!el) return () => {};
-  let seed = 5; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let seed = 9; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const mk = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
   const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
   const ease = x => (x = cl(x), x * x * (3 - 2 * x));
   const out = x => 1 - Math.pow(1 - cl(x), 3);
-  const lerp2 = (a, b, k) => a + (b - a) * k;
-  // half-height of the double-diamond envelope at x
-  const half = x => x < 215 ? 110 * (x - 30) / 185 : x < 400 ? 110 * (400 - x) / 185 : x < 585 ? 110 * (x - 400) / 185 : 110 * (770 - x) / 185;
-  const Y = (x, v) => 150 + v * half(x) * .8;
-  const T = 25;
-  const outline = $('#ddOutline'), olen = outline.getTotalLength();
-  outline.style.strokeDasharray = olen;
-  const pick = $('#ddPick'), ripple = $('#ddRipple'), product = $('#ddProduct'), thread = $('#ddThread'), tlen = thread.getTotalLength();
-  thread.style.strokeDasharray = tlen;
+  const mix = (a, b, k) => a + (b - a) * k;
+  const INK = '#262626', T = 26;
+
+  // soft-cornered double diamond
+  const D1 = [[14, 150], [215, 30], [417, 150], [215, 270]], D2 = [[383, 150], [585, 30], [786, 150], [585, 270]];
+  const rounded = (pts, c) => pts.map((P, i) => {
+    const A = pts[(i + pts.length - 1) % pts.length], B = pts[(i + 1) % pts.length];
+    const u = Q => { const dx = Q[0] - P[0], dy = Q[1] - P[1], l = Math.hypot(dx, dy); return [dx / l, dy / l, l]; };
+    const ua = u(A), ub = u(B), ca = Math.min(c, ua[2] / 2.2), cb = Math.min(c, ub[2] / 2.2);
+    return `${i ? 'L' : 'M'}${(P[0] + ua[0] * ca).toFixed(1)} ${(P[1] + ua[1] * ca).toFixed(1)}Q${P[0]} ${P[1]} ${(P[0] + ub[0] * cb).toFixed(1)} ${(P[1] + ub[1] * cb).toFixed(1)}`;
+  }).join('') + 'Z';
+  const outline = $('#ddOutline');
+  outline.setAttribute('d', rounded(D1, 38) + rounded(D2, 38));
+  $('#ddClipPath').setAttribute('d', rounded(D1, 38));
+  const olen = outline.getTotalLength(); outline.style.strokeDasharray = olen;
+  // half-height of the diamonds at x (keeps bubbles inside the outline)
+  const d1 = x => x < 14 || x > 417 ? 0 : x <= 215 ? 120 * (x - 14) / 201 : 120 * (417 - x) / 202;
+  const d2 = x => x < 383 || x > 786 ? 0 : x <= 585 ? 120 * (x - 383) / 202 : 120 * (786 - x) / 201;
+  const half = x => Math.max(d1(x), d2(x));
+  const Y = (x, v) => 150 + v * half(x) * .72;
+
+  const pick = $('#ddPick'), ripple = $('#ddRipple'), cube = $('#ddCube'), thread = $('#ddThread');
+  const scanG = $('#ddScanG'), scan = $('#ddScan'), trail = $('#ddTrailRect');
   const phs = $$('.ph', el);
 
-  // problems: wandering rings, born at the left tip
+  // ---- diamond 1: problems are scanned, grouped, ranked; the top three merge into one ----
+  const G0 = [[110, 113], [150, 192], [225, 150], [285, 108], [285, 196]];      // where each group first gathers
+  const RANK = [2, 4, 0, 3, 1];                                                    // group -> priority rank (0 = best)
+  const SLOT = [352, 298, 244, 190, 136], SR = [13, 17, 20, 22, 22];               // sorted slot x and cluster radius per rank
+  const VAL = [1.35, 1.2, 1.05, .85, .7], VOP = [.95, .85, .75, .5, .4];
   const probs = [];
-  for (let k = 0; k < 44; k++) {
-    const chosen = k === 0;
-    probs.push({ chosen, tb: chosen ? 1.8 : 1.2 + rnd() * 2.6, hx: chosen ? 250 : 80 + rnd() * 260, hv: chosen ? .12 : rnd() * 2 - 1, d: rnd() * 1.4, r: 2.5 + rnd() * 3.5, ph: rnd() * 6.28,
-      node: mk('circle', { class: 'pb', r: 3 }, $('#ddProblems')) });
+  for (let k = 0; k < 45; k++) {
+    const g = k % 5, ang = rnd() * 6.283, rad = Math.sqrt(rnd());
+    const hx = 80 + rnd() * 260;
+    probs.push({ g, rank: RANK[g], tb: .9 + rnd() * 1.7, hx, hv: rnd() * 2 - 1, gd: rnd() * .3, r: 2.6 + rnd() * 3, ph: rnd() * 6.28, ox: Math.cos(ang) * rad, oy: Math.sin(ang) * rad,
+      node: mk('circle', { class: 'pb', r: 3, fill: INK, 'fill-opacity': 0 }, $('#ddProblems')) });
   }
-  // ideas: varied geometric shapes, born at the selected problem
+  // ---- diamond 2: ideas are created, each is held up against the problem, one fits ----
   const shapes = r => [`M${-r} ${-r}H${r}V${r}H${-r}Z`, `M0 ${-r * 1.2}L${r * 1.1} ${r * .9}H${-r * 1.1}Z`, `M${-r} 0L0 ${-r}L${r} 0L0 ${r}Z`, `M${-r * .35} ${-r}H${r * .35}V${-r * .35}H${r}V${r * .35}H${r * .35}V${r}H${-r * .35}V${r * .35}H${-r}V${-r * .35}H${-r * .35}Z`];
+  const SLOT2 = [455, 150], WIN = 5, CW = .62, C0 = 15;
   const ideas = [];
-  for (let j = 0; j < 38; j++) {
-    const chosen = j === 0, r = 3 + rnd() * 3;
-    ideas.push({ chosen, tc: chosen ? 10.9 : 10.6 + rnd() * 2, hx: chosen ? 540 : 450 + rnd() * 240, hv: chosen ? -.1 : rnd() * 2 - 1, d: rnd() * 1.4, ph: rnd() * 6.28, rot: (rnd() - .5) * 1.4,
-      node: mk('path', { class: 'id', d: shapes(r)[j % 4] }, $('#ddIdeas')) });
+  for (let j = 0; j < 28; j++) {
+    const cand = j < 6 ? (j === 0 ? WIN : j - 1) : -1;     // j=0 is the winner, j=1..5 are the rejected candidates tested before it
+    const r = j === 0 ? 5 : 3 + rnd() * 3;
+    ideas.push({ cand, tc: 12 + rnd() * 1.6, hx: cand >= 0 ? 485 + rnd() * 190 : 450 + rnd() * 250, hv: rnd() * 2 - 1, ph: rnd() * 6.28, rot: (rnd() - .5) * 1.4, tf: 15.2 + rnd() * 2.4,
+      node: mk('path', { class: 'id', d: shapes(r)[j === 0 ? 0 : j % 4] }, $('#ddIdeas')) });
   }
   const label = (i, on) => phs[i] && phs[i].classList.toggle('on', on);
   let t = 0, last = null;
@@ -192,49 +213,78 @@ const ddUpdate = (() => {
     if (!active) { last = null; return; }
     if (last === null) last = now;
     t += Math.min(now - last, .25); last = now;
-    const tt = reduce ? 20.5 : t % T;
-    const g = 1 - ease((tt - 23.2) / 1.4);               // loop fade-out
+    const tt = reduce ? 22 : t % T;
+    const g = 1 - ease((tt - 24.2) / 1.4);                  // loop fade-out
     outline.style.strokeDashoffset = olen * (1 - ease(tt / 2.4));
-    label(0, tt >= 1.2 && tt < 6.5); label(1, tt >= 6.5 && tt < 10.6); label(2, tt >= 10.6 && tt < 15.2); label(3, tt >= 15.2 && tt < 23.2);
+    label(0, tt >= .9 && tt < 6.8); label(1, tt >= 6.8 && tt < 12); label(2, tt >= 12 && tt < 15); label(3, tt >= 15 && tt < 24.2);
 
-    // 1 + 2: discover (diverge) then define (converge on the waist)
+    // scanning band sweeps across the problems
+    const sx = 30 + 400 * cl((tt - 4.8) / 2);
+    scanG.setAttribute('opacity', (tt > 4.7 && tt < 7.3 ? Math.min(1, (tt - 4.7) * 4, (7.3 - tt) * 3) : 0).toFixed(2));
+    scan.setAttribute('x1', sx.toFixed(1)); scan.setAttribute('x2', sx.toFixed(1)); trail.setAttribute('x', (sx - 80).toFixed(1));
+
+    // problems: jettison -> scan -> group -> sort by priority -> cull -> merge
+    const oe = ease((tt - 8.2) / 1.4);
     for (const p of probs) {
       const a = out((tt - p.tb) / 2.4);
-      const q = ease((tt - 6.8 - p.d) / 2.6);
-      const wx = Math.sin(tt * .8 + p.ph) * 7 * a * (1 - q), wv = Math.sin(tt * .6 + p.ph * 2) * .06 * a * (1 - q);
-      const x = lerp2(lerp2(30, p.hx, a), 400, q) + wx, v = lerp2(p.hv * a, 0, q) + wv;
-      let op = Math.min(a * 3, 1) * g;
-      if (!p.chosen) op *= 1 - ease((q - .45) / .55); else op = 0;
-      p.node.setAttribute('cx', x.toFixed(1)); p.node.setAttribute('cy', Y(x, v).toFixed(1));
-      p.node.setAttribute('opacity', (op * .75).toFixed(2));
-      if (p.chosen) { p.cx = x; p.cy = Y(x, v); p.q = q; p.a = a; }
+      const wob = 1 - ease((tt - 6.8) / 1);
+      const hx = p.hx + Math.sin(tt * .8 + p.ph) * 7 * a * wob, hy = Y(p.hx, p.hv) + Math.sin(tt * .6 + p.ph * 2) * 5 * a * wob;
+      let x = mix(40, hx, a), y = mix(150, hy, a);
+      // group
+      const ge = ease((tt - 6.8 - p.gd) / 1.3);
+      const sl = SLOT[p.rank], cr = mix(18, SR[p.rank], oe);
+      const me = ease((tt - 10.5 - p.rank * .1) / 1.4);
+      const ax = mix(mix(G0[p.g][0], sl, oe), 400, me), ay = mix(mix(G0[p.g][1], 150, oe), 150, me);
+      const sc = 1 - me;
+      x = mix(x, ax + p.ox * cr * sc, ge); y = mix(y, ay + p.oy * cr * sc, ge);
+      // scan: ping as the band passes, then carry its measured value (size + weight)
+      const k = tt - (4.8 + (p.hx - 30) / 400 * 2);
+      const ping = k > 0 ? Math.exp(-k * 4) : 0, val = k > 0 ? ease(k / .5) : 0;
+      const r = p.r * mix(1, VAL[p.rank], val) * (1 + .8 * ping);
+      let op = mix(.7, VOP[p.rank], val) * Math.min(a * 3, 1) * g;
+      if (p.rank > 2) op *= 1 - ease((tt - 9.7) / .8);
+      op *= 1 - ease((me - .55) / .45);                  // dissolves into the merged bubble
+      p.node.setAttribute('cx', x.toFixed(1)); p.node.setAttribute('cy', y.toFixed(1)); p.node.setAttribute('r', r.toFixed(2));
+      p.node.setAttribute('opacity', op.toFixed(2)); p.node.setAttribute('fill-opacity', (ping * .6).toFixed(2));
     }
-    // the chosen problem is the last one standing: it becomes a solid point at the waist
-    const c = probs[0], seen = cl(c.a * 2) * g;
-    const pq = c.q;
-    pick.setAttribute('cx', c.cx.toFixed(1)); pick.setAttribute('cy', c.cy.toFixed(1));
-    pick.setAttribute('r', (4 + 3 * pq + (tt > 10.4 ? Math.sin(tt * 2) * .5 : 0)).toFixed(2));
-    pick.setAttribute('opacity', (seen * (.35 + .65 * pq)).toFixed(2));
-    const rp = cl((tt - 9.6) / 1.6);
-    ripple.setAttribute('r', (8 + rp * 46).toFixed(1)); ripple.setAttribute('opacity', (rp > 0 && rp < 1 ? (1 - rp) * .6 * g : 0).toFixed(2));
+    // the merged problem
+    const pa = ease((tt - 11.7) / .6);
+    pick.setAttribute('r', (4 + 5 * pa + (tt > 15 && tt < 18.6 ? Math.sin(tt * 9) * .8 : 0)).toFixed(2));
+    pick.setAttribute('opacity', (pa * g).toFixed(2));
+    const r1 = cl((tt - 11.7) / 1.5), r2 = cl((tt - 18.4) / 1.5), rp = r1 > 0 && r1 < 1 ? r1 : r2 > 0 && r2 < 1 ? r2 : 0;
+    ripple.setAttribute('r', (9 + rp * 44).toFixed(1)); ripple.setAttribute('opacity', (rp ? (1 - rp) * .6 * g : 0).toFixed(2));
 
-    // 3 + 4: develop (diverge into ideas) then deliver (converge on the right fit)
+    // ideas: created -> held against the problem one by one -> the one that fits goes on
+    let tx = 409, top = 0;
+    const win = ideas[0], wu = (tt - (C0 + WIN * CW)) / CW;
+    const wTravel = ease((tt - 18.8) / 1.5), wx = mix(SLOT2[0], 700, wTravel);
     for (const i of ideas) {
       const a = out((tt - i.tc) / 2.4);
-      const q = ease((tt - 15.4 - i.d) / 2.6);
-      const wx = Math.sin(tt * .8 + i.ph) * 7 * a * (1 - q), wv = Math.sin(tt * .6 + i.ph * 2) * .06 * a * (1 - q);
-      const x = lerp2(lerp2(400, i.hx, a), 700, q) + wx, v = lerp2(i.hv * a, 0, q) + wv;
-      let op = Math.min(a * 3, 1) * g;
-      if (!i.chosen) op *= 1 - ease((q - .45) / .55); else op *= 1 - ease((tt - 17.6) / .8);
-      i.node.setAttribute('transform', `translate(${x.toFixed(1)} ${Y(x, v).toFixed(1)}) rotate(${((tt * 18 * i.rot) % 360).toFixed(0)})`);
-      i.node.setAttribute('opacity', (op * .8).toFixed(2));
+      const wob = i.cand >= 0 ? 1 : 1;
+      let x = mix(400, i.hx + Math.sin(tt * .8 + i.ph) * 7 * a, a), y = mix(150, Y(i.hx, i.hv) + Math.sin(tt * .6 + i.ph * 2) * 5 * a, a);
+      let op = Math.min(a * 3, 1) * g * .8, rot = tt * 18 * i.rot, sc = 1;
+      if (i.cand < 0) op *= 1 - ease((tt - i.tf) / .8);
+      else {
+        const c = i.cand, u = (tt - (C0 + c * CW)) / CW, ap = ease(u / .35);
+        x = mix(x, SLOT2[0], ap); y = mix(y, SLOT2[1], ap); rot *= 1 - ap; op = mix(op, g, ap * .5);
+        if (c < WIN) {
+          const rj = ease((u - .7) / .3);
+          x += rj * 14; y += rj * 18; op *= 1 - rj; if (u > 1) op = 0;
+          if (u > .35 && u < .95 && top === 0) { tx = x - 8; top = .25 + .25 * Math.abs(Math.sin(tt * 40)); }
+        } else {
+          x = mix(x, wx, wTravel); sc = 1 + 1.1 * wTravel; op *= 1 - ease((tt - 19.8) / .8);
+          if (u > .35) { tx = x - 8; top = .55; }
+        }
+      }
+      i.node.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rot % 360).toFixed(0)}) scale(${sc.toFixed(2)})`);
+      i.node.setAttribute('opacity', op.toFixed(2));
     }
-    // the right fit settles into a solid product, tied back to the chosen problem
-    const m = ease((tt - 17.4) / 1.2);
-    product.setAttribute('opacity', (m * g).toFixed(2));
-    product.setAttribute('transform', `translate(700 150) scale(${(.7 + .3 * m).toFixed(3)}) translate(-700 -150)`);
-    thread.style.strokeDashoffset = tlen * (1 - ease((tt - 18.3) / 1.3));
-    thread.setAttribute('opacity', (.55 * g).toFixed(2));
+    // the connecting thread follows whichever idea is being tested, then the winner
+    const m = ease((tt - 19.8) / .9);
+    thread.setAttribute('x2', Math.min(tx, 676).toFixed(1)); thread.setAttribute('opacity', (top * g * (pa > .5 ? 1 : 0)).toFixed(2));
+    // the right fit becomes a solid cube
+    cube.setAttribute('opacity', (m * g).toFixed(2));
+    cube.setAttribute('transform', `translate(700 ${(150 + (m > .99 ? Math.sin(tt * 1.5) * 2 : 0)).toFixed(1)}) scale(${(.55 + .45 * m).toFixed(3)})`);
   };
 })();
 const ddEl = $('#dd'); let ddVis = false;
