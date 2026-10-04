@@ -20,97 +20,9 @@ document.addEventListener('pointerleave', () => { ptr.active = false; });
 let scrollY = scrollY0(), scrollVel = 0, lastScroll = scrollY;
 function scrollY0() { return window.scrollY || 0; }
 
-/* ---------- organic outline engine ---------- */
-function rng(seed) { let s = seed * 9301 + 49297; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
-function harmonics(seed) {
-  const r = rng(seed + 1);
-  return [2, 3, 4, 5, 7].map((k, i) => ({ k, ph: r() * TAU, sp: (.25 + r() * .5) * (r() < .5 ? -1 : 1), am: 1 / (1 + i * .7) }));
-}
-const sgnPow = (v, p) => Math.sign(v) * Math.pow(Math.abs(v), p);
-
-/* Closed smooth path of an organic superellipse in a 0..1 box.
-   o: n (squircle exponent), amp, t, h (harmonics), N, scale, hover, px, py (pointer 0..1) */
-function outline(o) {
-  const N = o.N || 26, pts = [], e = 2 / o.n, sc = o.scale ?? 1;
-  for (let i = 0; i < N; i++) {
-    const a = i / N * TAU, c = Math.cos(a), s = Math.sin(a);
-    let k = 1;
-    for (const h of o.h) k += o.amp * h.am * Math.sin(h.k * a + h.ph + o.t * h.sp);
-    let x = .5 + .5 * sgnPow(c, e) * k * sc * o.fit;
-    let y = .5 + .5 * sgnPow(s, e) * k * sc * o.fit;
-    if (o.hover > .001) {            // jelly pull toward pointer
-      const dx = o.px - x, dy = o.py - y, d2 = dx * dx + dy * dy;
-      const g = o.hover * .06 * Math.exp(-d2 / .08);
-      x += dx * g; y += dy * g;
-    }
-    pts.push(x, y);
-  }
-  let d = '';
-  const P = i => { i = (i + N) % N; return [pts[i * 2], pts[i * 2 + 1]]; };
-  for (let i = 0; i < N; i++) {
-    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
-    if (i === 0) d += `M${p1[0].toFixed(4)} ${p1[1].toFixed(4)}`;
-    d += `C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(4)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(4)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(4)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(4)} ${p2[0].toFixed(4)} ${p2[1].toFixed(4)}`;
-  }
-  return d + 'Z';
-}
-
 const NS = 'http://www.w3.org/2000/svg';
 const shapes = [];   // things updated every frame while visible
 const io = new IntersectionObserver(es => es.forEach(en => { en.target.__vis = en.isIntersecting; }), { rootMargin: '120px' });
-
-/* element backgrounds */
-$$('[data-blob]').forEach((el, idx) => {
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('class', 'blob-bg');
-  svg.setAttribute('viewBox', '0 0 1 1');
-  svg.setAttribute('preserveAspectRatio', 'none');
-  const f = document.createElementNS(NS, 'path'); f.setAttribute('class', 'f');
-  const s = document.createElementNS(NS, 'path'); s.setAttribute('class', 's');
-  svg.append(f, s);
-  el.prepend(svg);
-  const st = {
-    el, f, s, h: harmonics(idx * 3 + 1), n: +el.dataset.n || 4, amp: +el.dataset.amp || .03,
-    hover: 0, hoverT: 0, px: .5, py: .5, rect: null, wob: 1, phase: idx * 1.7,
-  };
-  el.__vis = true; io.observe(el);
-  el.addEventListener('pointerenter', () => { st.hoverT = 1; });
-  el.addEventListener('pointerleave', () => { st.hoverT = 0; });
-  el.addEventListener('pointermove', e => {
-    const r = el.getBoundingClientRect();
-    st.px = (e.clientX - r.left) / r.width; st.py = (e.clientY - r.top) / r.height;
-  }, { passive: true });
-  st.update = (t) => {
-    st.hover = lerp(st.hover, st.hoverT, .03);
-    const amp = st.amp * (1 + st.hover * .35);
-    const d = outline({ n: st.n, amp, t: t * (1 + st.hover * .25) + st.phase, h: st.h, N: 28, fit: .94, hover: st.hover, px: st.px, py: st.py });
-    f.setAttribute('d', d); s.setAttribute('d', d);
-  };
-  shapes.push(st);
-});
-
-/* concentric art in cards */
-$$('.art').forEach(svg => {
-  const i = +svg.dataset.art, rings = 5, paths = [];
-  for (let r = 0; r < rings; r++) { const p = document.createElementNS(NS, 'path'); p.style.opacity = (.55 - r * .09).toFixed(2); svg.appendChild(p); paths.push(p); }
-  const st = { el: svg, hs: paths.map((_, r) => harmonics(i * 11 + r * 3)), n: [2.2, 3, 2, 4, 2.6, 3.4][i % 6], px: .5, py: .5, hover: 0, hoverT: 0 };
-  svg.__vis = true; io.observe(svg);
-  const card = svg.closest('.card');
-  card.addEventListener('pointerenter', () => st.hoverT = 1);
-  card.addEventListener('pointerleave', () => st.hoverT = 0);
-  card.addEventListener('pointermove', e => {
-    const r = svg.getBoundingClientRect();
-    st.px = (e.clientX - r.left) / r.width; st.py = (e.clientY - r.top) / r.height;
-  }, { passive: true });
-  st.update = t => {
-    st.hover = lerp(st.hover, st.hoverT, .025);
-    paths.forEach((p, r) => p.setAttribute('d', outline({
-      n: st.n, amp: .05 + r * .012 + st.hover * .015, t: t * (.8 + st.hover * .2) + r * .6, h: st.hs[r],
-      N: 24, fit: .96, scale: .22 + r * .19 + st.hover * r * .008, hover: st.hover * .5 * (r + 1) / rings, px: st.px, py: st.py
-    })));
-  };
-  shapes.push(st);
-});
 
 /* ---------- hero avatar ---------- */
 const avatar = $('#avatar');
@@ -457,6 +369,18 @@ function drawField(t, dt) {
   if (!drawField.shown) { drawField.shown = true; canvas.classList.add('ready'); }
 }
 
+/* ---------- path: the thread draws down the timeline as you scroll ---------- */
+const tl = $('.timeline'), tlItems = tl ? $$('li', tl) : [];
+function updateThread() {
+  if (!tl) return;
+  const r = tl.getBoundingClientRect();
+  if (r.bottom < -200 || r.top > innerHeight + 200) return;
+  const p = clamp((innerHeight * .62 - r.top) / r.height, 0, 1);
+  tl.style.setProperty('--p', p.toFixed(4));
+  const y = p * r.height;
+  tlItems.forEach(li => li.classList.toggle('on', li.offsetTop + 30 <= y));
+}
+
 /* ---------- loop ---------- */
 let last = performance.now(), t = 0, frozen = reduce, fieldAcc = 0, fieldScroll = -1, slow = 0;
 function frame(now) {
@@ -476,6 +400,7 @@ function frame(now) {
   }
   if (scrollY < innerHeight * 1.3) { updateAvatar(t); updateName(t); }
   for (const s of shapes) if (s.el.__vis) s.update(t);
+  updateThread();
   ddUpdate(now / 1000, ddVis && ddEl.classList.contains('in'));
   if (!frozen || !frame.once) { frame.once = true; }
   requestAnimationFrame(frame);
