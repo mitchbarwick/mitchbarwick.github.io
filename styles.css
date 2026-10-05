@@ -333,3 +333,24 @@ em{font-style:italic;font-variation-settings:"SOFT" 100,"WONK" 1}
   .pulse,.halo,.ring-pulse,.focus,.bar,.rider{animation:none!important}
   .rider{display:none}
 }
+
+/* PowerPoint to Video: deck -> script -> voice -> video */
+.pv{margin:1.2rem 0 .6rem;max-width:620px}
+.pv svg{width:100%;height:auto;display:block;overflow:visible}
+.pv .s{fill:none;stroke:var(--ink);stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+.pv .f{fill:var(--ink)}
+.pv .sl{fill:rgba(255,255,255,.6)}
+.pv .front{fill:rgba(255,255,255,.9)}
+.pv .flowline{stroke:var(--line)}
+.pv .lbl{font-size:10px}
+.pv .deck{opacity:0;transform:translateX(-12px);transition:opacity .8s ease .2s,transform 1s var(--ease) .2s}
+.pv.in .deck{opacity:1;transform:none}
+.pv .vid{opacity:0;transform:scale(.92);transform-box:fill-box;transform-origin:center;transition:opacity .8s ease 2.4s,transform 1s var(--ease) 2.4s}
+.pv.in .vid{opacity:1;transform:none}
+.pv .track{fill:var(--line)}
+.pv .prog{fill:var(--ink);transform-box:fill-box;transform-origin:left;transform:scaleX(0)}
+.pv.in .prog{animation:play 6s linear 3s infinite}
+@keyframes play{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pv .bar{opacity:0;transition:opacity .6s ease 1.8s}
+.pv.in .bar{opacity:1}
+@media (prefers-reduced-motion:reduce){.pv .prog{animation:none;transform:scaleX(.6)}}
